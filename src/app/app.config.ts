@@ -7,6 +7,7 @@ import {
   provideZonelessChangeDetection,
 } from '@angular/core';
 import { provideRouter } from '@angular/router';
+import { provideSettings } from '@pp/settings';
 import { provideShared } from '@pp/shared/di';
 import { routes } from './app.routes';
 
@@ -18,6 +19,7 @@ export const appConfig: ApplicationConfig = {
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes),
     provideShared(),
+    provideSettings({ persistence: 'indexeddb' }),
     { provide: LOCALE_ID, useValue: 'es-PE' },
   ],
 };
