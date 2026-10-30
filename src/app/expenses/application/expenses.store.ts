@@ -43,6 +43,9 @@ export class ExpensesStore {
   /** The most recently deleted expense, kept so the UI can offer "Deshacer". */
   readonly lastDeleted = this._lastDeleted.asReadonly();
 
+  /** The user's default currency, re-exposed so pages need not reach into the settings feature. */
+  readonly defaultCurrency = this.settings.defaultCurrency;
+
   readonly recentWhats = computed(() => recent(this.all(), (e) => e.what));
   readonly recentPlaces = computed(() => recent(this.all(), (e) => e.place));
 

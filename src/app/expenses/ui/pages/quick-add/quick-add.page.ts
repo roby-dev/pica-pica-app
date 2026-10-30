@@ -1,14 +1,64 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { AppHeader, EmptyState } from '@pp/shared/ui';
+import { ChangeDetectionStrategy, Component, computed, inject, signal, viewChild } from '@angular/core';
+import { totalFor } from '@pp/shared/kernel';
+import { AppHeader, StatCard, ToastService } from '@pp/shared/ui';
+import { CatalogStore } from '../../../application/catalog.store';
+import { ExpensesStore } from '../../../application/expenses.store';
+import { ExpenseForm, type ExpenseFormValue } from '../../components/expense-form/expense-form';
 
-/** Placeholder until the quick-add form lands (WU-13). */
 @Component({
   selector: 'pp-quick-add-page',
-  imports: [AppHeader, EmptyState],
+  imports: [AppHeader, ExpenseForm, StatCard],
   template: `
     <pp-app-header title="Agregar" subtitle="Registra un gasto hormiga" />
-    <pp-empty-state icon="coin" title="Pronto" message="Aquí podrás registrar un gasto en segundos." />
+    <div class="flex flex-col gap-5 px-4 pb-6">
+      <div class="grid grid-cols-2 gap-3">
+        <pp-stat-card label="Hoy" [money]="today()" />
+        <pp-stat-card label="Esta semana" [money]="week()" />
+      </div>
+      <pp-expense-form
+        #form
+        [categories]="catalog.activeCategories()"
+        [methods]="catalog.activeMethods()"
+        [whatSuggestions]="expenses.recentWhats()"
+        [placeSuggestions]="expenses.recentPlaces()"
+        [defaultCurrency]="expenses.defaultCurrency()"
+        [busy]="busy()"
+        [serverError]="error()"
+        [autofocus]="true"
+        (submitted)="save($event)"
+      />
+    </div>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class QuickAddPage {}
+export class QuickAddPage {
+  protected readonly catalog = inject(CatalogStore);
+  protected readonly expenses = inject(ExpensesStore);
+  private readonly toast = inject(ToastService);
+
+  private readonly form = viewChild.required<ExpenseForm>('form');
+
+  protected readonly busy = signal(false);
+  protected readonly error = signal<string | null>(null);
+
+  protected readonly today = computed(() => totalFor(this.expenses.todayTotals(), this.expenses.defaultCurrency()));
+  protected readonly week = computed(() => totalFor(this.expenses.weekTotals(), this.expenses.defaultCurrency()));
+
+  protected async save(value: ExpenseFormValue): Promise<void> {
+    this.busy.set(true);
+    this.error.set(null);
+    const result = await this.expenses.add(value);
+    this.busy.set(false);
+    if (!result.ok) {
+      this.error.set(result.error.message);
+      return;
+    }
+    this.form().reset();
+    const id = result.value.id;
+    this.toast.show({
+      message: 'Gasto guardado',
+      actionLabel: 'Deshacer',
+      onAction: () => void this.expenses.remove(id),
+    });
+  }
+}

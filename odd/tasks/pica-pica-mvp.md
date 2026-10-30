@@ -24,7 +24,7 @@ Spec source of truth: `docs/architecture.md` (read it fully; section 11 lists wo
 - [x] T10 WU-10 expenses ports + adapters — inline — 143 tests, contract suite green on memory+IndexedDB, lint clean, build OK; added Category/PaymentMethod.position
 - [x] T11 WU-11 expenses stores + use cases — inline — 162 tests: optimistic, rollback, undo, default currency from settings; lint clean, build OK
 - [x] T12 WU-12 shell + molecules/organisms — inline, 2 commits — 190 tests, lint clean, 5 lazy page chunks in build, tabs navigate
-- [ ] T13 WU-13 quick-add
+- [x] T13 WU-13 quick-add
 - [ ] T14 WU-14 history + edit
 - [ ] T15 WU-15 insights domain
 - [ ] T16 WU-16 insights store + page
