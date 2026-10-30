@@ -1,4 +1,4 @@
-import { err, ok, type Brand, type Result } from '@pp/shared/kernel';
+import { err, ok, toIsoWithOffset, type Brand, type Result } from '@pp/shared/kernel';
 import { ExpenseValidationError } from './expense.errors';
 
 /** ISO-8601 local date-time with offset, e.g. `2026-10-30T08:15:00-05:00`. */
@@ -21,15 +21,7 @@ export function parseOccurredAt(text: string, now: Date): Result<OccurredAt, Exp
 }
 
 /** Formats a Date as local time with its UTC offset, so the day an expense happened never shifts. */
-export function toOccurredAt(date: Date): OccurredAt {
-  const pad = (n: number, width = 2) => String(Math.trunc(Math.abs(n))).padStart(width, '0');
-  const offsetMinutes = -date.getTimezoneOffset();
-  const sign = offsetMinutes >= 0 ? '+' : '-';
-  const local =
-    `${pad(date.getFullYear(), 4)}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}` +
-    `T${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
-  return `${local}${sign}${pad(offsetMinutes / 60)}:${pad(offsetMinutes % 60)}` as OccurredAt;
-}
+export const toOccurredAt = (date: Date): OccurredAt => toIsoWithOffset(date) as OccurredAt;
 
 /** `YYYY-MM-DD` in the expense's own local time. */
 export const localDayKey = (at: OccurredAt): string => at.slice(0, 10);

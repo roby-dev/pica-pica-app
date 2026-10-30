@@ -21,3 +21,4 @@ export {
 } from './currency-totals';
 export { systemClock, type Clock } from './clock';
 export { uuidGenerator, type IdGenerator } from './id-generator';
+export { toIsoWithOffset } from './time';
