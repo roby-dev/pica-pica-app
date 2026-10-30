@@ -1,3 +1,20 @@
-import { Routes } from '@angular/router';
+import type { Routes } from '@angular/router';
+import { expensesRoutes } from '@pp/expenses';
+import { insightsRoutes } from '@pp/insights';
+import { settingsRoutes } from '@pp/settings';
+import { AppLayout } from '@pp/shell';
 
-export const routes: Routes = [];
+/** Composition root: each feature owns its routes, the shell owns the frame around them. */
+export const routes: Routes = [
+  {
+    path: '',
+    component: AppLayout,
+    children: [
+      { path: '', pathMatch: 'full', redirectTo: 'add' },
+      ...expensesRoutes,
+      ...insightsRoutes,
+      { path: 'settings', children: settingsRoutes },
+      { path: '**', redirectTo: 'add' },
+    ],
+  },
+];

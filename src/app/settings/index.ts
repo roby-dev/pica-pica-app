@@ -11,3 +11,4 @@ export {
   type SettingsPatch,
 } from './domain/settings.rules';
 export { provideSettings, type PersistenceKind, type SettingsOptions } from './settings.providers';
+export { settingsRoutes } from './settings.routes';
