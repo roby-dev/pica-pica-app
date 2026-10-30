@@ -419,50 +419,8 @@ Presentational components take `Money`/view-models via `input()`, emit via `outp
 
 ## 8. Glassmorphism design system + Tailwind v4 + iOS
 
-`src/styles.css` (Tailwind v4 CSS-first; `.postcssrc.json` → `{"plugins":{"@tailwindcss/postcss":{}}}`):
-```css
-@import "tailwindcss";
-@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
+**Palette revision (user, 2026-10-30):** matte light pastels (powder blue accent, peach secondary, slate-indigo ink), flat solid light background (no gradients), lower saturation/gloss, Manrope Variable self-hosted via `@fontsource-variable/manrope`. The authoritative tokens live in `src/styles.css`; the snippet below was superseded.
 
-@theme {
-  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", system-ui, sans-serif;
-  --color-accent: oklch(0.72 0.17 160);  --color-accent-2: oklch(0.70 0.19 300);
-  --color-danger: oklch(0.65 0.22 25);
-  --color-ink: oklch(0.22 0.02 260);     --color-ink-muted: oklch(0.45 0.02 260);
-  --radius-glass: 1.25rem; --radius-pill: 999px;
-  --blur-glass: 20px; --blur-glass-strong: 32px;
-  --shadow-glass: 0 8px 32px -8px rgb(15 23 42 / 0.25), inset 0 1px 0 rgb(255 255 255 / 0.45);
-}
-:root {
-  --glass-bg: rgb(255 255 255 / 0.55); --glass-bg-strong: rgb(255 255 255 / 0.72);
-  --glass-border: rgb(255 255 255 / 0.65); --glass-sat: 180%; --glass-fallback: rgb(248 250 252 / 0.94);
-  --app-bg: radial-gradient(60% 50% at 10% 0%, oklch(0.88 0.12 160 / .9), transparent 70%),
-            radial-gradient(50% 45% at 100% 20%, oklch(0.85 0.13 300 / .8), transparent 70%),
-            radial-gradient(70% 60% at 50% 110%, oklch(0.9 0.1 60 / .8), transparent 70%), oklch(0.97 0.01 250);
-}
-[data-theme=dark] {
-  --glass-bg: rgb(30 30 46 / 0.45); --glass-bg-strong: rgb(30 30 46 / 0.65);
-  --glass-border: rgb(255 255 255 / 0.12); --glass-sat: 160%; --glass-fallback: rgb(24 24 36 / 0.95);
-  --app-bg: radial-gradient(60% 50% at 10% 0%, oklch(0.45 0.12 160 / .7), transparent 70%),
-            radial-gradient(50% 45% at 100% 20%, oklch(0.40 0.15 300 / .7), transparent 70%), oklch(0.16 0.02 270);
-}
-@utility glass {
-  background: var(--glass-bg); border: 0.5px solid var(--glass-border);
-  border-radius: var(--radius-glass); box-shadow: var(--shadow-glass);
-  -webkit-backdrop-filter: blur(var(--blur-glass)) saturate(var(--glass-sat));   /* Safari needs prefix */
-  backdrop-filter: blur(var(--blur-glass)) saturate(var(--glass-sat));
-}
-@utility glass-strong { /* same with --glass-bg-strong + --blur-glass-strong (tab bar, sheets) */ }
-@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  .glass, .glass-strong { background: var(--glass-fallback); } }
-@media (prefers-reduced-transparency: reduce) {
-  .glass, .glass-strong { background: var(--glass-fallback); -webkit-backdrop-filter: none; backdrop-filter: none; } }
-@media (prefers-reduced-motion: reduce) { *,*::before,*::after { animation-duration:.01ms!important; transition-duration:.01ms!important; } }
-html { color-scheme: light dark; -webkit-text-size-adjust: 100%; }
-body { min-height: 100dvh; padding: env(safe-area-inset-top) env(safe-area-inset-right) 0 env(safe-area-inset-left);
-       -webkit-tap-highlight-color: transparent; overscroll-behavior-y: none; font-family: var(--font-sans); }
-.app-bg { position: fixed; inset: 0; z-index: -1; background: var(--app-bg); }
-```
 Theme: `system` follows `matchMedia('(prefers-color-scheme: dark)')`; `shell/theme` effect sets `data-theme` and
 `<meta name="theme-color">`. Text on glass ≥ 4.5:1 in both themes over the brightest gradient.
 

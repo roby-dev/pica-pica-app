@@ -1,44 +1,42 @@
+@import '@fontsource-variable/manrope';
 @import 'tailwindcss';
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 
+/* Palette: matte pastels. Powder blue accent, peach secondary, ink in slate indigo. */
 @theme {
-  --font-sans: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', system-ui, sans-serif;
-  --color-accent: oklch(0.72 0.17 160);
-  --color-accent-2: oklch(0.7 0.19 300);
-  --color-danger: oklch(0.65 0.22 25);
-  --color-ink: oklch(0.22 0.02 260);
-  --color-ink-muted: oklch(0.45 0.02 260);
+  --font-sans: 'Manrope Variable', system-ui, sans-serif;
+  --color-accent: oklch(0.82 0.08 255);
+  --color-accent-strong: oklch(0.7 0.11 262);
+  --color-accent-2: oklch(0.87 0.07 55);
+  --color-danger: oklch(0.73 0.11 20);
+  --color-ink: oklch(0.3 0.04 265);
+  --color-ink-muted: oklch(0.52 0.03 265);
   --radius-glass: 1.25rem;
   --radius-pill: 999px;
-  --blur-glass: 20px;
+  --blur-glass: 24px;
   --blur-glass-strong: 32px;
   --shadow-glass:
-    0 8px 32px -8px rgb(15 23 42 / 0.25), inset 0 1px 0 rgb(255 255 255 / 0.45);
+    0 6px 24px -10px rgb(80 90 140 / 0.28), inset 0 1px 0 rgb(255 255 255 / 0.6);
 }
 
 :root {
-  --glass-bg: rgb(255 255 255 / 0.55);
-  --glass-bg-strong: rgb(255 255 255 / 0.72);
-  --glass-border: rgb(255 255 255 / 0.65);
-  --glass-sat: 180%;
-  --glass-fallback: rgb(248 250 252 / 0.94);
-  --app-bg:
-    radial-gradient(60% 50% at 10% 0%, oklch(0.88 0.12 160 / 0.9), transparent 70%),
-    radial-gradient(50% 45% at 100% 20%, oklch(0.85 0.13 300 / 0.8), transparent 70%),
-    radial-gradient(70% 60% at 50% 110%, oklch(0.9 0.1 60 / 0.8), transparent 70%),
-    oklch(0.97 0.01 250);
+  --glass-bg: rgb(255 255 255 / 0.72);
+  --glass-bg-strong: rgb(255 255 255 / 0.88);
+  --glass-border: rgb(255 255 255 / 0.75);
+  --glass-sat: 115%;
+  --glass-fallback: rgb(250 249 252 / 0.95);
+  --app-bg: oklch(0.955 0.014 265);
 }
 
 [data-theme='dark'] {
-  --glass-bg: rgb(30 30 46 / 0.45);
-  --glass-bg-strong: rgb(30 30 46 / 0.65);
-  --glass-border: rgb(255 255 255 / 0.12);
-  --glass-sat: 160%;
-  --glass-fallback: rgb(24 24 36 / 0.95);
-  --app-bg:
-    radial-gradient(60% 50% at 10% 0%, oklch(0.45 0.12 160 / 0.7), transparent 70%),
-    radial-gradient(50% 45% at 100% 20%, oklch(0.4 0.15 300 / 0.7), transparent 70%),
-    oklch(0.16 0.02 270);
+  --color-ink: oklch(0.94 0.015 270);
+  --color-ink-muted: oklch(0.72 0.03 270);
+  --glass-bg: rgb(52 50 76 / 0.5);
+  --glass-bg-strong: rgb(52 50 76 / 0.7);
+  --glass-border: rgb(255 255 255 / 0.14);
+  --glass-sat: 110%;
+  --glass-fallback: rgb(40 38 62 / 0.96);
+  --app-bg: oklch(0.21 0.025 270);
 }
 
 @layer components {
@@ -103,8 +101,5 @@ body {
   overscroll-behavior-y: none;
   font-family: var(--font-sans);
   color: var(--color-ink);
-}
-
-[data-theme='dark'] body {
-  color: oklch(0.95 0.01 260);
+  font-variant-numeric: tabular-nums;
 }
