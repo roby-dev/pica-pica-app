@@ -18,7 +18,7 @@ Spec source of truth: `docs/architecture.md` (read it fully; section 11 lists wo
 - [x] T4 WU-04 Shared kernel — inline — 14 kernel specs, lint clean, build OK
 - [x] T5 WU-05 shared/ui atoms A — inline — 10 specs, lint clean, build OK, touch targets >=44px
 - [x] T6 WU-06 shared/ui atoms B — inline — 57 tests total, lint clean, build OK, parse cases incl. 20,50 and 1,250.50
-- [ ] T7 WU-07 shared/persistence
+- [x] T7 WU-07 shared/persistence — inline — 64 tests, lint clean, build OK; added shared/di (tokens + provideShared)
 - [ ] T8 WU-08 settings core
 - [ ] T9 WU-09 expenses domain
 - [ ] T10 WU-10 expenses ports + adapters

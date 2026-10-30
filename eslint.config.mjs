@@ -55,6 +55,7 @@ export default tseslint.config(
         { type: 'shared-persistence', pattern: 'src/app/shared/persistence' },
         { type: 'shared-ui', pattern: 'src/app/shared/ui' },
         { type: 'shared-testing', pattern: 'src/app/shared/testing' },
+        { type: 'shared-di', pattern: 'src/app/shared/di' },
         { type: 'shell', pattern: 'src/app/shell' },
         { type: 'domain', pattern: 'src/app/*/domain', capture: ['feature'] },
         {
@@ -90,6 +91,10 @@ export default tseslint.config(
           policies: [
             { from: { element: { type: 'kernel' } }, allow: { to: shared('kernel') } },
             {
+              from: { element: { type: 'shared-di' } },
+              allow: { to: shared('kernel', 'shared-persistence', 'shared-di') },
+            },
+            {
               from: { element: { type: 'shared-testing' } },
               allow: { to: shared('kernel', 'shared-testing') },
             },
@@ -107,13 +112,13 @@ export default tseslint.config(
             },
             {
               from: { element: { type: 'application' } },
-              allow: { to: [shared('kernel'), own('domain', 'application'), otherEntry] },
+              allow: { to: [shared('kernel', 'shared-di'), own('domain', 'application'), otherEntry] },
             },
             {
               from: { element: { type: 'infrastructure' } },
               allow: {
                 to: [
-                  shared('kernel', 'shared-persistence'),
+                  shared('kernel', 'shared-persistence', 'shared-di'),
                   own('domain', 'application', 'infrastructure'),
                   otherEntry,
                 ],
@@ -136,7 +141,7 @@ export default tseslint.config(
               from: { element: { type: 'feature-root' }, file: { categories: 'providers' } },
               allow: {
                 to: [
-                  shared('kernel', 'shared-persistence'),
+                  shared('kernel', 'shared-persistence', 'shared-di'),
                   own('domain', 'application', 'infrastructure'),
                   otherEntry,
                 ],
@@ -153,14 +158,14 @@ export default tseslint.config(
             {
               from: { element: { type: 'shell' } },
               allow: {
-                to: [shared('kernel', 'shared-ui', 'shared-persistence', 'shell'), anyEntry],
+                to: [shared('kernel', 'shared-ui', 'shared-persistence', 'shared-di', 'shell'), anyEntry],
               },
             },
             {
               from: { file: { categories: 'app-root' } },
               allow: {
                 to: [
-                  shared('kernel', 'shared-ui', 'shared-persistence', 'shell'),
+                  shared('kernel', 'shared-ui', 'shared-persistence', 'shared-di', 'shell'),
                   anyEntry,
                   { file: { categories: 'app-root' } },
                 ],
