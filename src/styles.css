@@ -20,19 +20,16 @@
 }
 
 :root {
-  --glass-bg: rgb(255 255 255 / 0.5);
-  --glass-bg-strong: rgb(255 255 255 / 0.7);
-  --glass-border: rgb(255 255 255 / 0.8);
-  --glass-sat: 120%;
+  --glass-bg: rgb(255 255 255 / 0.6);
+  --glass-bg-strong: rgb(255 255 255 / 0.78);
+  --glass-border: rgb(255 255 255 / 0.75);
+  --glass-sat: 115%;
   --glass-fallback: rgb(250 249 252 / 0.95);
-  /* Hard-edged matte pastel discs on a flat base: the blur has real edges to work on. */
   --app-bg:
-    radial-gradient(circle 120px at 92% 8%, oklch(0.87 0.07 55) 0 119px, transparent 120px),
-    radial-gradient(circle 70px at 4% 28%, oklch(0.92 0.07 95) 0 69px, transparent 70px),
-    radial-gradient(circle 170px at 104% 50%, oklch(0.86 0.06 245) 0 169px, transparent 170px),
-    radial-gradient(circle 100px at 12% 72%, oklch(0.88 0.06 350) 0 99px, transparent 100px),
-    radial-gradient(circle 150px at 68% 104%, oklch(0.86 0.06 295) 0 149px, transparent 150px),
-    oklch(0.955 0.014 265);
+    radial-gradient(60% 50% at 8% 0%, oklch(0.92 0.06 55 / 0.95), transparent 70%),
+    radial-gradient(55% 45% at 100% 15%, oklch(0.9 0.05 245 / 0.95), transparent 70%),
+    radial-gradient(70% 55% at 45% 108%, oklch(0.92 0.05 345 / 0.9), transparent 70%),
+    oklch(0.97 0.01 270);
 }
 
 [data-theme='dark'] {
@@ -44,12 +41,9 @@
   --glass-sat: 110%;
   --glass-fallback: rgb(40 38 62 / 0.96);
   --app-bg:
-    radial-gradient(circle 120px at 92% 8%, oklch(0.4 0.06 40) 0 119px, transparent 120px),
-    radial-gradient(circle 70px at 4% 28%, oklch(0.42 0.06 95) 0 69px, transparent 70px),
-    radial-gradient(circle 170px at 104% 50%, oklch(0.38 0.07 250) 0 169px, transparent 170px),
-    radial-gradient(circle 100px at 12% 72%, oklch(0.4 0.07 350) 0 99px, transparent 100px),
-    radial-gradient(circle 150px at 68% 104%, oklch(0.38 0.07 295) 0 149px, transparent 150px),
-    oklch(0.21 0.025 270);
+    radial-gradient(60% 50% at 8% 0%, oklch(0.4 0.07 20 / 0.7), transparent 70%),
+    radial-gradient(55% 45% at 100% 15%, oklch(0.4 0.08 262 / 0.75), transparent 70%),
+    oklch(0.21 0.03 275);
 }
 
 @layer components {
