@@ -20,7 +20,7 @@ Spec source of truth: `docs/architecture.md` (read it fully; section 11 lists wo
 - [x] T6 WU-06 shared/ui atoms B — inline — 57 tests total, lint clean, build OK, parse cases incl. 20,50 and 1,250.50
 - [x] T7 WU-07 shared/persistence — inline — 64 tests, lint clean, build OK; added shared/di (tokens + provideShared)
 - [x] T8 WU-08 settings core — inline — 84 tests, lint clean, build OK; defaults on empty DB, currency change without threshold rejected
-- [ ] T9 WU-09 expenses domain
+- [x] T9 WU-09 expenses domain — inline — 113 tests, lint clean, build OK; rules 1,2,6,7 covered
 - [ ] T10 WU-10 expenses ports + adapters
 - [ ] T11 WU-11 expenses stores + use cases
 - [ ] T12 WU-12 shell + molecules/organisms
