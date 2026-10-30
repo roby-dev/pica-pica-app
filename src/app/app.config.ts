@@ -8,6 +8,7 @@ import {
 } from '@angular/core';
 import { provideRouter, withComponentInputBinding, withViewTransitions } from '@angular/router';
 import { provideExpenses } from '@pp/expenses';
+import { provideInsights } from '@pp/insights';
 import { provideSettings } from '@pp/settings';
 import { provideShared } from '@pp/shared/di';
 import { provideShell } from '@pp/shell';
@@ -24,6 +25,7 @@ export const appConfig: ApplicationConfig = {
     provideShell(),
     provideSettings({ persistence: 'indexeddb' }),
     provideExpenses({ persistence: 'indexeddb' }),
+    provideInsights(),
     { provide: LOCALE_ID, useValue: 'es-PE' },
   ],
 };
