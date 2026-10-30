@@ -39,9 +39,7 @@ export interface ExpenseRowVm {
         </span>
         <span class="flex flex-col items-end gap-1">
           <pp-amount-text [money]="row().money" [signed]="true" emphasis="md" />
-          @if (row().isAnt) {
-            <pp-badge tone="neutral" text="Hormiga" />
-          }
+          <pp-badge class="max-w-28 truncate" tone="neutral" [text]="row().categoryName" />
         </span>
       </button>
       <pp-icon-button icon="trash" [label]="'Eliminar ' + row().what" (pressed)="deleteRequested.emit(row().id)" />
@@ -57,8 +55,8 @@ export class ExpenseRow {
   readonly deleteRequested = output<string>();
 
   protected details(): string {
-    const { timeLabel, categoryName, place, methodName } = this.row();
-    return [timeLabel, categoryName, place, methodName].filter(Boolean).join(' · ');
+    const { timeLabel, place, methodName } = this.row();
+    return [timeLabel, place, methodName].filter(Boolean).join(' · ');
   }
 
   protected initial(): string {

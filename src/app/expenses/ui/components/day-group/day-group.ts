@@ -24,7 +24,7 @@ export interface DayGroupVm {
           }
         </span>
       </header>
-      <div class="glass flex flex-col divide-y divide-[var(--glass-border)] px-3">
+      <div class="glass flex flex-col divide-y divide-[var(--glass-border)] px-2">
         @for (row of group().rows; track row.id) {
           <pp-expense-row [row]="row" (opened)="opened.emit($event)" (deleteRequested)="deleteRequested.emit($event)" />
         }

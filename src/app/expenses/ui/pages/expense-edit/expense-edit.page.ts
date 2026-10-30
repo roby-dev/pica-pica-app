@@ -11,7 +11,7 @@ import { ExpenseForm, type ExpenseFormValue } from '../../components/expense-for
   imports: [AppHeader, Button, EmptyState, ExpenseForm],
   template: `
     <pp-app-header title="Editar gasto" [showBack]="true" (back)="location.back()" />
-    <div class="flex flex-col gap-4 px-4 pb-6">
+    <div class="flex flex-col gap-4 pb-6">
       @if (initial(); as value) {
         <pp-expense-form
           [categories]="categories()"

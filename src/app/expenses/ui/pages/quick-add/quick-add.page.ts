@@ -10,7 +10,7 @@ import { ExpenseForm, type ExpenseFormValue } from '../../components/expense-for
   selector: 'pp-quick-add-page',
   imports: [ExpenseForm, StatCard],
   template: `
-    <div class="flex flex-col gap-5 px-4 pb-6 pt-4">
+    <div class="flex flex-col gap-5 pb-6 pt-4">
       <div class="grid grid-cols-2 gap-3">
         <pp-stat-card label="Hoy" [money]="today()" />
         <pp-stat-card label="Esta semana" [money]="week()" />
