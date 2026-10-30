@@ -90,6 +90,10 @@ export default tseslint.config(
           policies: [
             { from: { element: { type: 'kernel' } }, allow: { to: shared('kernel') } },
             {
+              from: { element: { type: 'shared-testing' } },
+              allow: { to: shared('kernel', 'shared-testing') },
+            },
+            {
               from: { element: { type: 'shared-ui' } },
               allow: { to: shared('kernel', 'shared-ui') },
             },
