@@ -54,4 +54,25 @@ describe('CatalogStore', () => {
     const { store } = await setup();
     expect((await store.setCategoryArchived('nope' as never, true)).ok).toBe(false);
   });
+
+  it('renames a category and persists it', async () => {
+    const { store, repository } = await setup();
+    const result = await store.renameCategory(SEED_CATEGORIES[0].id, '  Cafecito ');
+    expect(result.ok).toBe(true);
+    expect(store.categoryById().get(SEED_CATEGORIES[0].id)?.name).toBe('Cafecito');
+    expect((await repository.listCategories())[0].name).toBe('Cafecito');
+  });
+
+  it.each(['', '   ', 'x'.repeat(25), 'snacks'])('refuses the category name %j', async (name) => {
+    const { store } = await setup();
+    expect((await store.renameCategory(SEED_CATEGORIES[0].id, name)).ok).toBe(false);
+    expect(store.categoryById().get(SEED_CATEGORIES[0].id)?.name).toBe('Café');
+  });
+
+  it('renames a payment method', async () => {
+    const { store } = await setup();
+    const id = store.methods()[0].id;
+    expect((await store.renameMethod(id, 'Cash')).ok).toBe(true);
+    expect(store.methodById().get(id)?.name).toBe('Cash');
+  });
 });

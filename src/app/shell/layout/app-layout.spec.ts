@@ -42,7 +42,7 @@ describe('AppLayout and routes', () => {
   it.each([
     ['/history', 'Tus gastos por día'],
     ['/insights', 'Dónde se va tu plata'],
-    ['/settings', 'Moneda, umbral y tema'],
+    ['/settings', 'Umbral y tema'],
   ])('lazy-loads %s', async (url, subtitle) => {
     const harness = await boot(url);
     expect(text(harness.routeNativeElement!.ownerDocument.body)).toContain(subtitle);

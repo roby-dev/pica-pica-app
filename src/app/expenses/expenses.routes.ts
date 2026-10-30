@@ -3,6 +3,11 @@ import type { Routes } from '@angular/router';
 /** Every page is a lazy chunk, so the first paint only loads the shell. */
 export const expensesRoutes: Routes = [
   {
+    path: 'settings/catalog',
+    title: 'Categorías y métodos',
+    loadComponent: () => import('./ui/pages/catalog/catalog.page').then((m) => m.CatalogPage),
+  },
+  {
     path: 'add',
     title: 'Agregar',
     loadComponent: () => import('./ui/pages/quick-add/quick-add.page').then((m) => m.QuickAddPage),

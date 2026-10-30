@@ -6,6 +6,7 @@ import type { CategoryId, PaymentMethodId } from '../domain/ids';
 import { CATALOG_REPOSITORY } from './ports/catalog.repository';
 import { withCategoryArchived, withMethodArchived } from './use-cases/archive-category';
 import type { CatalogSnapshot } from './use-cases/catalog-check';
+import { validCatalogName } from './use-cases/rename-item';
 
 interface Catalog extends CatalogSnapshot {
   readonly categories: readonly Category[];
@@ -58,6 +59,32 @@ export class CatalogStore {
     return this.commit(
       { ...this.catalog(), categories: this.categories().map((c) => (c.id === id ? updated : c)) },
       () => this.repository.saveCategory(updated),
+      updated,
+    );
+  }
+
+  async renameCategory(id: CategoryId, rawName: string): Promise<Result<Category, DomainError>> {
+    const existing = this.categoryById().get(id);
+    if (!existing) return err(new ExpenseNotFoundError(id));
+    const name = validCatalogName('category', rawName, id, this.categories());
+    if (!name.ok) return name;
+    const updated = { ...existing, name: name.value };
+    return this.commit(
+      { ...this.catalog(), categories: this.categories().map((c) => (c.id === id ? updated : c)) },
+      () => this.repository.saveCategory(updated),
+      updated,
+    );
+  }
+
+  async renameMethod(id: PaymentMethodId, rawName: string): Promise<Result<PaymentMethod, DomainError>> {
+    const existing = this.methodById().get(id);
+    if (!existing) return err(new ExpenseNotFoundError(id));
+    const name = validCatalogName('paymentMethod', rawName, id, this.methods());
+    if (!name.ok) return name;
+    const updated = { ...existing, name: name.value };
+    return this.commit(
+      { ...this.catalog(), methods: this.methods().map((m) => (m.id === id ? updated : m)) },
+      () => this.repository.savePaymentMethod(updated),
       updated,
     );
   }
