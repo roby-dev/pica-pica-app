@@ -75,27 +75,36 @@ export class ExpenseEditPage {
   protected async save(value: ExpenseFormValue): Promise<void> {
     this.busy.set(true);
     this.error.set(null);
-    const result = await this.expenses.update(this.id() as ExpenseId, value);
-    this.busy.set(false);
-    if (!result.ok) {
-      this.error.set(result.error.message);
-      return;
+    try {
+      const result = await this.expenses.update(this.id() as ExpenseId, value);
+      if (!result.ok) {
+        this.error.set(result.error.message);
+        return;
+      }
+      this.toast.show({ message: 'Cambios guardados' });
+      this.location.back();
+    } catch {
+      this.error.set('No se pudo guardar los cambios. Inténtalo de nuevo.');
+    } finally {
+      this.busy.set(false);
     }
-    this.toast.show({ message: 'Cambios guardados' });
-    this.location.back();
   }
 
   protected async remove(): Promise<void> {
-    const result = await this.expenses.remove(this.id() as ExpenseId);
-    if (!result.ok) {
-      this.error.set(result.error.message);
-      return;
+    try {
+      const result = await this.expenses.remove(this.id() as ExpenseId);
+      if (!result.ok) {
+        this.error.set(result.error.message);
+        return;
+      }
+      this.toast.show({
+        message: 'Gasto eliminado',
+        actionLabel: 'Deshacer',
+        onAction: () => void this.expenses.undoRemove(),
+      });
+      this.location.back();
+    } catch {
+      this.error.set('No se pudo eliminar el gasto. Inténtalo de nuevo.');
     }
-    this.toast.show({
-      message: 'Gasto eliminado',
-      actionLabel: 'Deshacer',
-      onAction: () => void this.expenses.undoRemove(),
-    });
-    this.location.back();
   }
 }

@@ -85,4 +85,25 @@ describe('QuickAddPage', () => {
     toast!.onAction!();
     await vi.waitFor(() => expect(store.all()).toHaveLength(0));
   });
+
+  it('stops the spinner and shows a message when saving throws unexpectedly', async () => {
+    const fixture = await setup();
+    const root = el(fixture);
+    vi.spyOn(TestBed.inject(ExpensesStore), 'add').mockRejectedValue(new Error('boom'));
+
+    type(root, 'pp-amount-input input', '4.50');
+    type(root, 'pp-text-field input', 'Café');
+    fixture.detectChanges();
+    chip(root, 'pp-category-picker', 'Café').click();
+    chip(root, 'pp-method-picker', 'Yape').click();
+    fixture.detectChanges();
+    root.querySelector<HTMLButtonElement>('pp-button button[type="submit"]')!.click();
+
+    await vi.waitFor(() => {
+      fixture.detectChanges();
+      expect(text(root)).toContain('No se pudo guardar');
+    });
+    expect(root.querySelector('pp-button button[type="submit"]')!.getAttribute('aria-busy')).toBe('false');
+    expect(root.querySelector<HTMLButtonElement>('pp-button button[type="submit"]')!.disabled).toBe(false);
+  });
 });

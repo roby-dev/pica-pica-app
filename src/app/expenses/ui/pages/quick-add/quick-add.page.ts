@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal, viewChild } from '@angular/core';
 import { totalFor } from '@pp/shared/kernel';
 import { StatCard, ToastService } from '@pp/shared/ui';
+import type { ExpenseId } from '../../../domain/ids';
 import { CatalogStore } from '../../../application/catalog.store';
 import { ExpensesStore } from '../../../application/expenses.store';
 import { ExpenseForm, type ExpenseFormValue } from '../../components/expense-form/expense-form';
@@ -46,14 +47,22 @@ export class QuickAddPage {
   protected async save(value: ExpenseFormValue): Promise<void> {
     this.busy.set(true);
     this.error.set(null);
-    const result = await this.expenses.add(value);
-    this.busy.set(false);
-    if (!result.ok) {
-      this.error.set(result.error.message);
-      return;
+    try {
+      const result = await this.expenses.add(value);
+      if (!result.ok) {
+        this.error.set(result.error.message);
+        return;
+      }
+      this.saved(result.value.id);
+    } catch {
+      this.error.set('No se pudo guardar el gasto. Inténtalo de nuevo.');
+    } finally {
+      this.busy.set(false);
     }
+  }
+
+  private saved(id: ExpenseId): void {
     this.form().reset();
-    const id = result.value.id;
     this.toast.show({
       message: 'Gasto guardado',
       actionLabel: 'Deshacer',

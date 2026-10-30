@@ -69,8 +69,8 @@ export class HistoryPage {
   }
 
   protected async remove(id: string): Promise<void> {
-    const result = await this.expenses.remove(id as ExpenseId);
-    if (!result.ok) {
+    const result = await this.expenses.remove(id as ExpenseId).catch(() => null);
+    if (!result?.ok) {
       this.toast.show({ message: 'No se pudo eliminar el gasto' });
       return;
     }
