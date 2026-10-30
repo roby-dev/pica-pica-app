@@ -71,8 +71,6 @@
   .scroll-row {
     display: flex;
     gap: 0.5rem;
-    margin-inline: -1rem;
-    padding-inline: 1rem;
     overflow-x: auto;
     overscroll-behavior-x: contain;
     scroll-snap-type: x proximity;
