@@ -50,9 +50,10 @@ export class SwUpdateService {
   private async apply(updates: SwUpdate): Promise<void> {
     try {
       await updates.activateUpdate();
-    } finally {
-      // Reload even if activation reported nothing: the worst case is loading the same version again.
-      this.reload();
+    } catch {
+      // Activation can fail (offline, worker already replaced). Reloading is still the right move:
+      // the worst case is loading the same version again.
     }
+    this.reload();
   }
 }
