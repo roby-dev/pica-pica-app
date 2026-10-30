@@ -7,7 +7,9 @@ export interface ExpenseRowVm {
   readonly id: string;
   readonly what: string;
   readonly money: Money;
-  readonly categoryEmoji: string;
+  readonly categoryName: string;
+  /** Any CSS color; drawn as the ring around the category initial. */
+  readonly categoryColor: string;
   readonly place: string | null;
   readonly methodName: string;
   readonly timeLabel: string;
@@ -26,9 +28,10 @@ export interface ExpenseRowVm {
         (click)="opened.emit(row().id)"
       >
         <span
-          class="grid size-11 shrink-0 place-items-center rounded-full border-[0.5px] border-chip-border bg-chip text-xl"
+          class="grid size-11 shrink-0 place-items-center rounded-full border-2 bg-chip text-base font-bold uppercase text-ink"
+          [style.border-color]="row().categoryColor"
           aria-hidden="true"
-          >{{ row().categoryEmoji }}</span
+          >{{ initial() }}</span
         >
         <span class="flex min-w-0 flex-1 flex-col">
           <span class="truncate text-base font-semibold text-ink">{{ row().what }}</span>
@@ -54,7 +57,11 @@ export class ExpenseRow {
   readonly deleteRequested = output<string>();
 
   protected details(): string {
-    const { timeLabel, place, methodName } = this.row();
-    return [timeLabel, place, methodName].filter(Boolean).join(' · ');
+    const { timeLabel, categoryName, place, methodName } = this.row();
+    return [timeLabel, categoryName, place, methodName].filter(Boolean).join(' · ');
+  }
+
+  protected initial(): string {
+    return this.row().categoryName.trim().charAt(0) || '·';
   }
 }

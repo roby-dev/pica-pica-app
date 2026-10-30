@@ -189,7 +189,6 @@ export class InsightsPage {
     this.store.categories().map((c) => ({
       key: c.key,
       label: c.label,
-      emoji: c.emoji,
       value: c.totalMinor,
       color: c.color ?? FALLBACK_COLOR,
       valueText: this.formatMinor()(c.totalMinor),

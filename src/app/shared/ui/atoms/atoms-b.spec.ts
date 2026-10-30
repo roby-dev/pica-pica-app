@@ -31,7 +31,6 @@ describe('Chip', () => {
   it('reflects selection and emits the toggled value', async () => {
     const fixture = TestBed.createComponent(Chip);
     fixture.componentRef.setInput('label', 'Café');
-    fixture.componentRef.setInput('emoji', '☕');
     await fixture.whenStable();
     const spy = vi.fn();
     fixture.componentInstance.toggled.subscribe(spy);

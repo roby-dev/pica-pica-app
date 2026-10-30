@@ -76,16 +76,17 @@ describe('toDayGroups', () => {
     expect(flag('Uber')).toBe(false); // 12.00 USD is below 20.00 but a different currency
   });
 
-  it('fills category emoji and method name, with a fallback for unknown ids', () => {
+  it('fills category and method names, with a fallback for unknown ids', () => {
     const orphan = expense('9', 'Raro', { amountMinor: 100, currency: PEN }, at(30), {
       categoryId: categoryId('gone'),
       paymentMethodId: paymentMethodId('gone'),
     });
     const [row] = toDayGroups([orphan], context())[0].rows;
-    expect(row.categoryEmoji).toBe('🪙');
+    expect(row.categoryName).toBe('Sin categoría');
     expect(row.methodName).toBe('');
     const [known] = toDayGroups([items[0]], context())[0].rows;
-    expect(known.categoryEmoji).toBe('☕');
+    expect(known.categoryName).toBe('Café');
+    expect(known.categoryColor).toBe('peach');
     expect(known.methodName).toBe('Yape');
   });
 });

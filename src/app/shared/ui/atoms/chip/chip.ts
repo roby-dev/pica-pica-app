@@ -12,9 +12,6 @@ import { ChangeDetectionStrategy, Component, input, output } from '@angular/core
       [attr.aria-pressed]="selected()"
       (click)="toggled.emit(!selected())"
     >
-      @if (emoji()) {
-        <span aria-hidden="true">{{ emoji() }}</span>
-      }
       {{ label() }}
     </button>
   `,
@@ -23,7 +20,6 @@ import { ChangeDetectionStrategy, Component, input, output } from '@angular/core
 })
 export class Chip {
   readonly label = input.required<string>();
-  readonly emoji = input<string>();
   /** Any CSS color, applied as the background while selected. */
   readonly color = input<string>();
   readonly selected = input(false);

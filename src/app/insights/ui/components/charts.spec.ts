@@ -54,7 +54,7 @@ describe('BarChart', () => {
 
 describe('DonutChart', () => {
   const slices: readonly DonutSlice[] = [
-    { key: 'food', label: 'Comida', emoji: '🍔', value: 300, color: 'red', valueText: 'S/ 3.00' },
+    { key: 'food', label: 'Comida', value: 300, color: 'red', valueText: 'S/ 3.00' },
     { key: 'ride', label: 'Transporte', value: 100, color: 'blue', valueText: 'S/ 1.00' },
     { key: 'none', label: 'Vacía', value: 0, color: 'gray', valueText: 'S/ 0.00' },
   ];

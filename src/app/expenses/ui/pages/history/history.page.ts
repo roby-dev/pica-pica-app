@@ -19,7 +19,6 @@ import { filterHistory, toDayGroups } from './history-view';
         @for (category of catalog.categories(); track category.id) {
           <pp-chip
             [label]="category.name"
-            [emoji]="category.emoji"
             [color]="category.color"
             [selected]="categoryId() === category.id"
             (toggled)="categoryId.set($event ? category.id : null)"

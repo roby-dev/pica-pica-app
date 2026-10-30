@@ -10,8 +10,6 @@ import { provideExpenses } from '../../../expenses.providers';
 import { HistoryPage } from './history.page';
 
 const text = (el: Element) => (el.textContent ?? '').replace(/\s+/g, ' ').trim();
-/** The list only: category filter chips repeat names like "Café". */
-const list = (root: HTMLElement) => text(root.querySelector('pp-expense-list')!);
 
 async function setup() {
   TestBed.configureTestingModule({
@@ -61,8 +59,8 @@ describe('HistoryPage', () => {
     input.value = 'pasaje';
     input.dispatchEvent(new Event('input', { bubbles: true }));
     fixture.detectChanges();
-    expect(list(root)).toContain('Pasaje');
-    expect(list(root)).not.toContain('Café');
+    expect(root.querySelector('button[aria-label="Editar Pasaje"]')).not.toBeNull();
+    expect(root.querySelector('button[aria-label="Editar Café"]')).toBeNull();
 
     input.value = 'zzz';
     input.dispatchEvent(new Event('input', { bubbles: true }));
@@ -75,7 +73,7 @@ describe('HistoryPage', () => {
     root.querySelector<HTMLButtonElement>('button[aria-label="Eliminar Café"]')!.click();
     await vi.waitFor(() => expect(store.all()).toHaveLength(1));
     fixture.detectChanges();
-    expect(list(root)).not.toContain('Café');
+    expect(root.querySelector('button[aria-label="Editar Café"]')).toBeNull();
 
     await vi.waitFor(() => expect(TestBed.inject(ToastService).current()?.actionLabel).toBe('Deshacer'));
     TestBed.inject(ToastService).current()!.onAction!();

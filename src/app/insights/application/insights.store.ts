@@ -24,7 +24,6 @@ const PLACE_LIMIT = 5;
 
 /** A ranked group with a human label resolved from the catalog. */
 export interface LabeledItem extends RankedItem {
-  readonly emoji?: string;
   readonly color?: string;
 }
 
@@ -110,6 +109,6 @@ const toDay = (date: Date): string => toIsoWithOffset(date).slice(0, 10);
 function label(items: readonly RankedItem[], info: ReadonlyMap<string, LabelInfo>, fallback: string): readonly LabeledItem[] {
   return items.map((item) => {
     const found = info.get(item.key);
-    return { ...item, label: found?.name ?? fallback, emoji: found?.emoji, color: found?.color };
+    return { ...item, label: found?.name ?? fallback, color: found?.color };
   });
 }

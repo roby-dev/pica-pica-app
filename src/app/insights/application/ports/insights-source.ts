@@ -5,7 +5,6 @@ import type { SpendRecord } from '../../domain/expense-analytics';
 /** How a category or method is shown. Only `name` is guaranteed. */
 export interface LabelInfo {
   readonly name: string;
-  readonly emoji?: string;
   readonly color?: string;
 }
 

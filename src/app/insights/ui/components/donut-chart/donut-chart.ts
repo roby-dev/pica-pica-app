@@ -3,7 +3,6 @@ import { ChangeDetectionStrategy, Component, computed, input, model } from '@ang
 export interface DonutSlice {
   readonly key: string;
   readonly label: string;
-  readonly emoji?: string;
   readonly value: number;
   /** Any CSS color. */
   readonly color: string;
@@ -71,9 +70,6 @@ const GAP = 0.6;
             >
               <span class="size-3 shrink-0 rounded-full" [style.background-color]="arc.slice.color" aria-hidden="true"></span>
               <span class="min-w-0 flex-1 truncate text-sm font-medium text-ink">
-                @if (arc.slice.emoji) {
-                  <span aria-hidden="true">{{ arc.slice.emoji }}</span>
-                }
                 {{ arc.slice.label }}
               </span>
               <span class="text-sm tabular-nums text-ink-muted">{{ arc.slice.valueText }}</span>

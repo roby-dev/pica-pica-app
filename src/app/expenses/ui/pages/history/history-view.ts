@@ -51,7 +51,8 @@ function toRow(expense: Expense, context: HistoryViewContext): ExpenseRowVm {
     id: expense.id,
     what: expense.what,
     money: expense.amount,
-    categoryEmoji: category?.emoji ?? '🪙',
+    categoryName: category?.name ?? 'Sin categoría',
+    categoryColor: category?.color ?? 'oklch(0.75 0.03 285)',
     place: expense.place,
     methodName: context.methods.get(expense.paymentMethodId)?.name ?? '',
     timeLabel: new Intl.DateTimeFormat(context.locale, { hour: '2-digit', minute: '2-digit' }).format(

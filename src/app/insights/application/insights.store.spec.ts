@@ -28,7 +28,7 @@ function setup(records: readonly SpendRecord[], now = new Date('2026-10-30T13:00
     loading: signal(false),
     threshold: signal<Money>({ amountMinor: 2000, currency: PEN }),
     defaultCurrency: signal(PEN),
-    categories: signal<ReadonlyMap<string, LabelInfo>>(new Map([['food', { name: 'Comida', emoji: '🍔', color: 'peach' }]])),
+    categories: signal<ReadonlyMap<string, LabelInfo>>(new Map([['food', { name: 'Comida', color: 'peach' }]])),
     methods: signal<ReadonlyMap<string, LabelInfo>>(new Map([['cash', { name: 'Efectivo' }]])),
   };
   TestBed.configureTestingModule({
@@ -103,7 +103,7 @@ describe('InsightsStore numbers', () => {
   it('resolves category and method names, with a fallback for unknown ids', () => {
     const { store } = setup([...records, spend('2026-10-05', 300, { categoryId: 'gone', paymentMethodId: 'gone' })]);
     expect(store.categories().map((c) => c.label)).toEqual(['Comida', 'Sin categoría']);
-    expect(store.categories()[0]).toMatchObject({ emoji: '🍔', color: 'peach' });
+    expect(store.categories()[0]).toMatchObject({ color: 'peach' });
     expect(store.methods().map((m) => m.label)).toEqual(['Efectivo', 'Sin método']);
   });
 

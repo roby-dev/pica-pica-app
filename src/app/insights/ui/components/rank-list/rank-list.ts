@@ -3,7 +3,6 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 export interface RankRow {
   readonly key: string;
   readonly label: string;
-  readonly emoji?: string;
   /** Pre-formatted amount. */
   readonly valueText: string;
   /** Fraction of the group, 0 to 1. Drives the bar. */
@@ -20,9 +19,6 @@ export interface RankRow {
         <li class="flex flex-col gap-1.5">
           <div class="flex items-baseline gap-2">
             <span class="min-w-0 flex-1 truncate text-sm font-medium text-ink">
-              @if (row.emoji) {
-                <span aria-hidden="true">{{ row.emoji }}</span>
-              }
               {{ row.label }}
             </span>
             <span class="text-xs text-ink-muted">{{ row.count }} {{ row.count === 1 ? 'gasto' : 'gastos' }}</span>

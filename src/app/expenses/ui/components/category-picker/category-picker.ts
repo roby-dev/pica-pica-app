@@ -14,7 +14,6 @@ import type { CategoryId } from '../../../domain/ids';
         @for (category of categories(); track category.id) {
           <pp-chip
             [label]="category.name"
-            [emoji]="category.emoji"
             [color]="category.color"
             [selected]="selectedId() === category.id"
             (toggled)="selectedId.set($event ? category.id : null)"

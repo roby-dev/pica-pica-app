@@ -26,7 +26,7 @@ export class ExpensesInsightsSource implements InsightsSource {
   readonly defaultCurrency = this.expenses.defaultCurrency;
 
   readonly categories = computed<ReadonlyMap<string, LabelInfo>>(
-    () => new Map(this.catalog.categories().map((c) => [c.id, { name: c.name, emoji: c.emoji, color: c.color }])),
+    () => new Map(this.catalog.categories().map((c) => [c.id, { name: c.name, color: c.color }])),
   );
 
   readonly methods = computed<ReadonlyMap<string, LabelInfo>>(
