@@ -25,7 +25,7 @@ Spec source of truth: `docs/architecture.md` (read it fully; section 11 lists wo
 - [x] T11 WU-11 expenses stores + use cases — inline — 162 tests: optimistic, rollback, undo, default currency from settings; lint clean, build OK
 - [x] T12 WU-12 shell + molecules/organisms — inline, 2 commits — 190 tests, lint clean, 5 lazy page chunks in build, tabs navigate
 - [x] T13 WU-13 quick-add
-- [ ] T14 WU-14 history + edit
+- [x] T14 WU-14 history + edit
 - [ ] T15 WU-15 insights domain
 - [ ] T16 WU-16 insights store + page
 - [ ] T17 WU-17 settings UI + catalog

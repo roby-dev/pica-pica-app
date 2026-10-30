@@ -46,6 +46,9 @@ export class ExpensesStore {
   /** The user's default currency, re-exposed so pages need not reach into the settings feature. */
   readonly defaultCurrency = this.settings.defaultCurrency;
 
+  /** Amounts at or below this count as ant expenses; re-exposed for the same reason as the currency. */
+  readonly antThreshold = this.settings.antExpenseThreshold;
+
   readonly recentWhats = computed(() => recent(this.all(), (e) => e.what));
   readonly recentPlaces = computed(() => recent(this.all(), (e) => e.place));
 
@@ -59,6 +62,11 @@ export class ExpensesStore {
     const week = isoWeekKey(toOccurredAt(this.clock.now()));
     return sumBy(this.all(), (e) => isoWeekKey(e.occurredAt) === week);
   });
+
+  /** Current time from the injected clock, so pages stay testable without touching shared/di. */
+  now(): Date {
+    return this.clock.now();
+  }
 
   getById(id: ExpenseId): Expense | undefined {
     return this.all().find((e) => e.id === id);
