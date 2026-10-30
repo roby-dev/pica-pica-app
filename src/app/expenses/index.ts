@@ -12,6 +12,7 @@ export { provideExpenses, type ExpensesOptions } from './expenses.providers';
 export { expensesRoutes } from './expenses.routes';
 export { SEED_CATEGORIES, SEED_PAYMENT_METHODS } from './domain/catalog.seeds';
 export {
+  countsAsAnt,
   ensurePickable,
   type Category,
   type PaymentMethod,

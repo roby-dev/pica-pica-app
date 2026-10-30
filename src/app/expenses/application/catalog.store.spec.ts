@@ -1,5 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { SEED_CATEGORIES } from '../domain/catalog.seeds';
+import { countsAsAnt } from '../domain/category';
 import { InMemoryCatalogRepository } from '../infrastructure/memory/in-memory-catalog.repository';
 import { CatalogStore } from './catalog.store';
 import { CATALOG_REPOSITORY, type CatalogRepository } from './ports/catalog.repository';
@@ -74,5 +75,15 @@ describe('CatalogStore', () => {
     const id = store.methods()[0].id;
     expect((await store.renameMethod(id, 'Cash')).ok).toBe(true);
     expect(store.methodById().get(id)?.name).toBe('Cash');
+  });
+
+  it('stores the ant-spending choice without touching old categories', async () => {
+    const { store, repository } = await setup();
+    const [cafe, transporte] = [SEED_CATEGORIES[0], SEED_CATEGORIES[2]];
+    expect(countsAsAnt(store.categoryById().get(cafe.id)!)).toBe(true);
+    expect(countsAsAnt(store.categoryById().get(transporte.id)!)).toBe(false);
+    await store.setCategoryAntSpending(transporte.id, true);
+    expect(countsAsAnt(store.categoryById().get(transporte.id)!)).toBe(true);
+    expect((await repository.listCategories()).find((c) => c.id === transporte.id)?.antSpending).toBe(true);
   });
 });

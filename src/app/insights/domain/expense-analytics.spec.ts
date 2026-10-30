@@ -140,6 +140,18 @@ describe('ant expenses', () => {
     expect(split.antShare).toBeCloseTo(0.2);
   });
 
+  it('leaves small expenses of non-ant categories out of the ant split and the top list', () => {
+    const records = [
+      spend('2026-10-01', 500),
+      spend('2026-10-02', 300, { what: 'Pasaje', countsAsAnt: false }),
+      spend('2026-10-03', 300, { what: 'Pasaje', countsAsAnt: false }),
+    ];
+    const split = antSplit(records, PEN, threshold);
+    expect(split).toMatchObject({ antTotalMinor: 500, antCount: 1 });
+    expect(split.antShare).toBeCloseTo(500 / 1100);
+    expect(topAnt(records, PEN, threshold).map((i) => i.what)).toEqual(['Café']);
+  });
+
   it('has no share when nothing was spent', () => {
     expect(antSplit([], PEN, threshold)).toMatchObject({ classified: true, antShare: null });
   });

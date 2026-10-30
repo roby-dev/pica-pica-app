@@ -21,6 +21,8 @@ export interface SpendRecord {
   readonly paymentMethodId: string;
   readonly place: string | null;
   readonly day: string;
+  /** False when the category is one the user does not treat as ant spending (Transporte, Mercado...). Defaults to true. */
+  readonly countsAsAnt?: boolean;
 }
 
 /*
@@ -131,6 +133,10 @@ export const byPlace = (records: readonly SpendRecord[]) =>
 export const isAntExpense = (amount: Money, threshold: Money): boolean =>
   amount.currency === threshold.currency && amount.amountMinor <= threshold.amountMinor;
 
+/** Rule 5b: a record is an ant expense when it is small enough and its category counts as ant spending. */
+const isAntRecord = (record: SpendRecord, threshold: Money): boolean =>
+  record.countsAsAnt !== false && isAntExpense(record.amount, threshold);
+
 export interface AntSplit {
   /** False when the currency differs from the threshold's: ant status cannot be judged without a conversion. */
   readonly classified: boolean;
@@ -142,7 +148,7 @@ export interface AntSplit {
 
 export function antSplit(records: readonly SpendRecord[], currency: CurrencyCode, threshold: Money): AntSplit {
   if (currency !== threshold.currency) return { classified: false, antTotalMinor: 0, antCount: 0, antShare: null };
-  const ant = records.filter((r) => r.amount.currency === currency && isAntExpense(r.amount, threshold));
+  const ant = records.filter((r) => r.amount.currency === currency && isAntRecord(r, threshold));
   const antTotalMinor = sumMinor(ant);
   const totalMinor = sumMinor(records.filter((r) => r.amount.currency === currency));
   return { classified: true, antTotalMinor, antCount: ant.length, antShare: totalMinor === 0 ? null : antTotalMinor / totalMinor };
@@ -164,7 +170,7 @@ export function topAnt(records: readonly SpendRecord[], currency: CurrencyCode, 
   if (currency !== threshold.currency) return [];
   const groups = new Map<string, { what: string; place: string | null; count: number; totalMinor: number }>();
   for (const r of records) {
-    if (r.amount.currency !== currency || !isAntExpense(r.amount, threshold)) continue;
+    if (r.amount.currency !== currency || !isAntRecord(r, threshold)) continue;
     const key = `${r.what.trim().toLowerCase()}|${r.place?.trim().toLowerCase() ?? ''}`;
     const entry = groups.get(key) ?? { what: r.what.trim(), place: r.place?.trim() ?? null, count: 0, totalMinor: 0 };
     entry.count += 1;

@@ -1,5 +1,5 @@
 import { Injectable, computed, inject } from '@angular/core';
-import { CatalogStore, ExpensesStore, localDayKey } from '@pp/expenses';
+import { CatalogStore, ExpensesStore, countsAsAnt, localDayKey } from '@pp/expenses';
 import type { SpendRecord } from '../domain/expense-analytics';
 import type { InsightsSource, LabelInfo } from '../application/ports/insights-source';
 
@@ -9,8 +9,9 @@ export class ExpensesInsightsSource implements InsightsSource {
   private readonly expenses = inject(ExpensesStore);
   private readonly catalog = inject(CatalogStore);
 
-  readonly records = computed<readonly SpendRecord[]>(() =>
-    this.expenses.all().map((e) => ({
+  readonly records = computed<readonly SpendRecord[]>(() => {
+    const categories = this.catalog.categoryById();
+    return this.expenses.all().map((e) => ({
       id: e.id,
       what: e.what,
       amount: e.amount,
@@ -18,8 +19,9 @@ export class ExpensesInsightsSource implements InsightsSource {
       paymentMethodId: e.paymentMethodId,
       place: e.place,
       day: localDayKey(e.occurredAt),
-    })),
-  );
+      countsAsAnt: countsAsAnt(categories.get(e.categoryId) ?? { id: e.categoryId }),
+    }));
+  });
 
   readonly loading = computed(() => this.expenses.isLoading());
   readonly threshold = this.expenses.antThreshold;

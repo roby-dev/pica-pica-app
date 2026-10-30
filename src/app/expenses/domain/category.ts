@@ -11,7 +11,18 @@ export interface Category {
   readonly archived: boolean;
   /** Display order, ascending. */
   readonly position: number;
+  /**
+   * Whether small expenses here count as ant spending. Absent on categories saved before this existed;
+   * `countsAsAnt` fills the gap so stored data never needs migrating.
+   */
+  readonly antSpending?: boolean;
 }
+
+/** Categories that were never "ant" habits: fixed or planned spending. */
+const NOT_ANT_BY_DEFAULT: ReadonlySet<string> = new Set(['cat-transporte', 'cat-bodega', 'cat-mercado', 'cat-otros']);
+
+export const countsAsAnt = (category: Pick<Category, 'id' | 'antSpending'>): boolean =>
+  category.antSpending ?? !NOT_ANT_BY_DEFAULT.has(category.id);
 
 export type PaymentMethodKind = 'cash' | 'debit' | 'credit' | 'transfer' | 'wallet' | 'other';
 

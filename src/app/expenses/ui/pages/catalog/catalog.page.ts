@@ -2,11 +2,14 @@ import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@a
 import { Router } from '@angular/router';
 import { AppHeader, Button, TextField, ToastService, Toggle } from '@pp/shared/ui';
 import { CatalogStore } from '../../../application/catalog.store';
+import { countsAsAnt } from '../../../domain/category';
 
 interface Item {
   readonly id: string;
   readonly name: string;
   readonly archived: boolean;
+  /** Only meaningful for categories. */
+  readonly antSpending: boolean;
 }
 
 type Kind = 'category' | 'method';
@@ -49,6 +52,13 @@ type Kind = 'category' | 'method';
                       />
                     </div>
                   </div>
+                  @if (section.kind === 'category') {
+                    <pp-toggle
+                      label="Cuenta como hormiga"
+                      [checked]="item.antSpending"
+                      (checkedChange)="setAnt(item.id, $event)"
+                    />
+                  }
                 }
               </div>
             }
@@ -69,8 +79,8 @@ export class CatalogPage {
   protected readonly error = signal<string | null>(null);
 
   protected readonly sections = computed<readonly { kind: Kind; title: string; items: readonly Item[] }[]>(() => [
-    { kind: 'category', title: 'Categorías', items: this.catalog.categories() },
-    { kind: 'method', title: 'Métodos de pago', items: this.catalog.methods() },
+    { kind: 'category', title: 'Categorías', items: this.catalog.categories().map((c) => ({ ...c, antSpending: countsAsAnt(c) })) },
+    { kind: 'method', title: 'Métodos de pago', items: this.catalog.methods().map((m) => ({ ...m, antSpending: false })) },
   ]);
 
   protected edit(item: Item): void {
@@ -97,6 +107,11 @@ export class CatalogPage {
       kind === 'category'
         ? await this.catalog.setCategoryArchived(id as never, !visible)
         : await this.catalog.setMethodArchived(id as never, !visible);
+    if (!result.ok) this.toast.show({ message: 'No se pudo guardar el cambio' });
+  }
+
+  protected async setAnt(id: string, value: boolean): Promise<void> {
+    const result = await this.catalog.setCategoryAntSpending(id as never, value);
     if (!result.ok) this.toast.show({ message: 'No se pudo guardar el cambio' });
   }
 

@@ -63,6 +63,18 @@ export class CatalogStore {
     );
   }
 
+  /** Chooses whether small expenses in this category count as ant spending in the analysis. */
+  async setCategoryAntSpending(id: CategoryId, antSpending: boolean): Promise<Result<Category, DomainError>> {
+    const existing = this.categoryById().get(id);
+    if (!existing) return err(new ExpenseNotFoundError(id));
+    const updated = { ...existing, antSpending };
+    return this.commit(
+      { ...this.catalog(), categories: this.categories().map((c) => (c.id === id ? updated : c)) },
+      () => this.repository.saveCategory(updated),
+      updated,
+    );
+  }
+
   async renameCategory(id: CategoryId, rawName: string): Promise<Result<Category, DomainError>> {
     const existing = this.categoryById().get(id);
     if (!existing) return err(new ExpenseNotFoundError(id));
