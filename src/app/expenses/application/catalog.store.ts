@@ -63,6 +63,18 @@ export class CatalogStore {
     );
   }
 
+  /** Adds the payment method when this device does not have it yet (used when restoring a backup). */
+  async ensureMethod(method: PaymentMethod): Promise<Result<PaymentMethod, DomainError>> {
+    const existing = this.methodById().get(method.id);
+    if (existing) return ok(existing);
+    const added = { ...method, position: this.methods().length };
+    return this.commit(
+      { ...this.catalog(), methods: [...this.methods(), added] },
+      () => this.repository.savePaymentMethod(added),
+      added,
+    );
+  }
+
   /** Chooses whether small expenses in this category count as ant spending in the analysis. */
   async setCategoryAntSpending(id: CategoryId, antSpending: boolean): Promise<Result<Category, DomainError>> {
     const existing = this.categoryById().get(id);

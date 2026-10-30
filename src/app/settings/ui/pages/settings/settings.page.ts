@@ -34,7 +34,7 @@ const THEMES: readonly SegmentOption[] = [
         Categorías y métodos de pago
       </a>
       <a routerLink="/settings/backup" class="glass block rounded-2xl p-4 font-semibold text-ink">
-        Importar datos de otra app
+        Respaldo e importación
       </a>
     </div>
   `,

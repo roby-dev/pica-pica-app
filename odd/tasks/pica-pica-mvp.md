@@ -28,8 +28,8 @@ Spec source of truth: `docs/architecture.md` (read it fully; section 11 lists wo
 - [x] T14 WU-14 history + edit
 - [x] T15 WU-15 insights domain
 - [x] T16 WU-16 insights store + page
-- [ ] T17 WU-17 settings UI + catalog
-- [ ] T18 WU-18 backup
+- [x] T17 WU-17 settings UI + catalog (default currency intentionally left out)
+- [x] T18 WU-18 backup (JSON export + restore + Smart Spend import; CSV and reminder left out)
 - [ ] T19 WU-19 PWA
 - [ ] T20 WU-20 E2E + polish
 
