@@ -39,6 +39,15 @@ export class CatalogItemInUseError extends DomainError {
   }
 }
 
+/** Storage rejected a write. The UI has already been rolled back when this is returned. */
+export class ExpensePersistenceError extends DomainError {
+  readonly code = 'EXPENSE_PERSISTENCE_FAILED';
+
+  constructor() {
+    super('The change could not be saved. Try again.');
+  }
+}
+
 export class ExpenseNotFoundError extends DomainError {
   readonly code = 'EXPENSE_NOT_FOUND';
 
