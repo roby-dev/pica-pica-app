@@ -1,0 +1,63 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# One deploy at a time; a newer push replaces a queued one but never cancels a running deploy.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+env:
+  # The site lives at https://<user>.github.io/<repo>/, so every asset URL needs this prefix.
+  BASE_HREF: /pica-pica-app/
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Reads the exact version from "packageManager" in package.json.
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      # Nothing broken gets published.
+      - run: pnpm lint
+      - run: pnpm lint:verify
+      - run: pnpm test
+
+      - run: pnpm exec ng build --base-href ${{ env.BASE_HREF }}
+
+      # Pages has no router: serve the app shell for any unknown path so deep links and reloads work.
+      - run: cp dist/pica-pica/browser/index.html dist/pica-pica/browser/404.html
+      # Skip Jekyll processing, which would hide files starting with an underscore.
+      - run: touch dist/pica-pica/browser/.nojekyll
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist/pica-pica/browser
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
