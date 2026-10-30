@@ -26,7 +26,7 @@ Spec source of truth: `docs/architecture.md` (read it fully; section 11 lists wo
 - [x] T12 WU-12 shell + molecules/organisms — inline, 2 commits — 190 tests, lint clean, 5 lazy page chunks in build, tabs navigate
 - [x] T13 WU-13 quick-add
 - [x] T14 WU-14 history + edit
-- [ ] T15 WU-15 insights domain
+- [x] T15 WU-15 insights domain
 - [ ] T16 WU-16 insights store + page
 - [ ] T17 WU-17 settings UI + catalog
 - [ ] T18 WU-18 backup
