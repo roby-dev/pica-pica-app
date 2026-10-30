@@ -419,7 +419,7 @@ Presentational components take `Money`/view-models via `input()`, emit via `outp
 
 ## 8. Glassmorphism design system + Tailwind v4 + iOS
 
-**Palette revision (user, 2026-10-30):** matte light pastels (powder blue accent, peach secondary, slate-indigo ink), flat solid light background (no gradients), lower saturation/gloss, Manrope Variable self-hosted via `@fontsource-variable/manrope`. The authoritative tokens live in `src/styles.css`; the snippet below was superseded.
+**Palette revision (user, 2026-10-30):** matte light pastels (powder blue accent, peach secondary, slate-indigo ink), flat light base with hard-edged matte pastel discs (no mesh gradients), lower saturation/gloss, Manrope Variable self-hosted via `@fontsource-variable/manrope`. The authoritative tokens live in `src/styles.css`; the snippet below was superseded.
 
 Theme: `system` follows `matchMedia('(prefers-color-scheme: dark)')`; `shell/theme` effect sets `data-theme` and
 `<meta name="theme-color">`. Text on glass ≥ 4.5:1 in both themes over the brightest gradient.
