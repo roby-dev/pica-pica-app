@@ -39,6 +39,18 @@ export class CatalogStore {
   readonly methodById = computed(() => new Map(this.methods().map((m) => [m.id, m])));
   readonly snapshot = computed<CatalogSnapshot>(() => this.catalog());
 
+  /** Adds the category when this device does not have it yet (older installs predate newer seeds). */
+  async ensureCategory(category: Category): Promise<Result<Category, DomainError>> {
+    const existing = this.categoryById().get(category.id);
+    if (existing) return ok(existing);
+    const added = { ...category, position: this.categories().length };
+    return this.commit(
+      { ...this.catalog(), categories: [...this.categories(), added] },
+      () => this.repository.saveCategory(added),
+      added,
+    );
+  }
+
   async setCategoryArchived(id: CategoryId, archived: boolean): Promise<Result<Category, DomainError>> {
     const existing = this.categoryById().get(id);
     if (!existing) return err(new ExpenseNotFoundError(id));

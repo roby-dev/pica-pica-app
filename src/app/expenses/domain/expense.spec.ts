@@ -139,7 +139,7 @@ describe('catalog (rule 6)', () => {
 
   it('seeds the Peru catalog with unique stable ids', () => {
     expect(SEED_CATEGORIES.map((c) => c.name)).toEqual([
-      'Café', 'Snacks', 'Transporte', 'Delivery', 'Suscripciones', 'Antojos', 'Bodega', 'Otros',
+      'Café', 'Snacks', 'Transporte', 'Delivery', 'Suscripciones', 'Antojos', 'Bodega', 'Mercado', 'Otros',
     ]);
     expect(SEED_PAYMENT_METHODS.map((m) => m.name)).toEqual([
       'Efectivo', 'Débito', 'Crédito', 'Yape/Plin', 'Transferencia',

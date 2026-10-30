@@ -1,5 +1,5 @@
 export { CatalogStore } from './application/catalog.store';
-export { ExpensesStore } from './application/expenses.store';
+export { ExpensesStore, type ImportSummary } from './application/expenses.store';
 export type { ExpenseCommand } from './application/use-cases/add-expense';
 export { CATALOG_REPOSITORY, type CatalogRepository } from './application/ports/catalog.repository';
 export {

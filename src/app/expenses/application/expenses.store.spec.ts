@@ -201,3 +201,23 @@ describe('ExpensesStore derived data', () => {
     expect(store.weekTotals().get(pen)).toBe(1750);
   });
 });
+
+describe('ExpensesStore.importMany', () => {
+  const imported = (id: string, overrides: Partial<ExpenseCommand> = {}) => ({ ...command(overrides), id });
+
+  it('saves every valid command keeping the given id and reports the counts', async () => {
+    const { store, repository } = await setup();
+    const summary = await store.importMany([imported('x1'), imported('x2', { what: 'Pan' }), imported('x3', { what: '' })]);
+    expect(summary).toEqual({ imported: 2, duplicates: 0, invalid: 1 });
+    expect(store.all().map((e) => e.id).sort()).toEqual(['x1', 'x2']);
+    expect((await repository.list()).length).toBe(2);
+  });
+
+  it('is idempotent: importing the same ids again adds nothing', async () => {
+    const { store } = await setup();
+    await store.importMany([imported('x1')]);
+    const again = await store.importMany([imported('x1')]);
+    expect(again).toEqual({ imported: 0, duplicates: 1, invalid: 0 });
+    expect(store.all().length).toBe(1);
+  });
+});

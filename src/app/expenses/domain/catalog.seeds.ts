@@ -27,7 +27,8 @@ export const SEED_CATEGORIES: readonly Category[] = [
   category(4, 'suscripciones', 'Suscripciones', '📱', 'oklch(0.88 0.06 290)'),
   category(5, 'antojos', 'Antojos', '🍦', 'oklch(0.9 0.06 350)'),
   category(6, 'bodega', 'Bodega', '🛒', 'oklch(0.89 0.06 150)'),
-  category(7, 'otros', 'Otros', '✨', 'oklch(0.89 0.02 265)'),
+  category(7, 'mercado', 'Mercado', '🧺', 'oklch(0.88 0.07 130)'),
+  category(8, 'otros', 'Otros', '✨', 'oklch(0.89 0.02 265)'),
 ];
 
 export const SEED_PAYMENT_METHODS: readonly PaymentMethod[] = [

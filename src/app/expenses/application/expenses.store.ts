@@ -10,7 +10,7 @@ import {
   type DomainError,
   type Result,
 } from '@pp/shared/kernel';
-import { restoreExpense, softDeleteExpense, type Expense } from '../domain/expense';
+import { createExpense, restoreExpense, softDeleteExpense, type Expense } from '../domain/expense';
 import { ExpenseNotFoundError, ExpensePersistenceError } from '../domain/expense.errors';
 import type { ExpenseId } from '../domain/ids';
 import { isoWeekKey, localDayKey, toOccurredAt } from '../domain/occurred-at';
@@ -20,6 +20,12 @@ import { addExpense, type ExpenseCommand } from './use-cases/add-expense';
 import { editExpense } from './use-cases/update-expense';
 
 const RECENT_LIMIT = 8;
+
+export interface ImportSummary {
+  readonly imported: number;
+  readonly duplicates: number;
+  readonly invalid: number;
+}
 
 @Injectable({ providedIn: 'root' })
 export class ExpensesStore {
@@ -82,6 +88,46 @@ export class ExpensesStore {
     if (!built.ok) return built;
     const expense = built.value;
     return this.commit([expense, ...this.all()], () => this.repository.save(expense), expense);
+  }
+
+  /**
+   * Bulk import with caller-chosen ids. Ids already in the store are skipped, so importing the same
+   * file twice changes nothing. Invalid commands are counted, never thrown.
+   */
+  async importMany(commands: readonly (ExpenseCommand & { readonly id: string })[]): Promise<ImportSummary> {
+    const existing = new Set(this.all().map((e) => e.id as string));
+    const now = this.clock.now();
+    const fresh: Expense[] = [];
+    let duplicates = 0;
+    let invalid = 0;
+    for (const command of commands) {
+      if (existing.has(command.id)) {
+        duplicates++;
+        continue;
+      }
+      const built = createExpense(
+        {
+          what: command.what,
+          amount: { amountMinor: command.amountMinor, currency: command.currency ?? this.settings.defaultCurrency() },
+          categoryId: command.categoryId,
+          paymentMethodId: command.paymentMethodId,
+          place: command.place,
+          occurredAt: command.occurredAt,
+          note: command.note,
+        },
+        { id: command.id, now },
+      );
+      if (!built.ok) {
+        invalid++;
+        continue;
+      }
+      existing.add(command.id);
+      fresh.push(built.value);
+    }
+    if (fresh.length === 0) return { imported: 0, duplicates, invalid };
+    const sorted = [...fresh, ...this.all()].sort((a, b) => Date.parse(b.occurredAt) - Date.parse(a.occurredAt));
+    const saved = await this.commit(sorted, () => this.repository.saveMany(fresh), fresh.length);
+    return { imported: saved.ok ? fresh.length : 0, duplicates, invalid: invalid + (saved.ok ? 0 : fresh.length) };
   }
 
   async update(id: ExpenseId, command: ExpenseCommand): Promise<Result<Expense, DomainError>> {

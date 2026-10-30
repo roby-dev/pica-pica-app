@@ -1,1 +1,1 @@
-export {};
+export { backupRoutes } from './backup.routes';

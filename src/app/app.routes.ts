@@ -1,4 +1,5 @@
 import type { Routes } from '@angular/router';
+import { backupRoutes } from '@pp/backup';
 import { expensesRoutes } from '@pp/expenses';
 import { insightsRoutes } from '@pp/insights';
 import { settingsRoutes } from '@pp/settings';
@@ -13,6 +14,7 @@ export const routes: Routes = [
       { path: '', pathMatch: 'full', redirectTo: 'add' },
       ...expensesRoutes,
       ...insightsRoutes,
+      ...backupRoutes,
       { path: 'settings', children: settingsRoutes },
       { path: '**', redirectTo: 'add' },
     ],
