@@ -137,6 +137,8 @@
 html {
   color-scheme: light dark;
   -webkit-text-size-adjust: 100%;
+  /* Taps respond at once and a double tap never zooms the page. */
+  touch-action: manipulation;
 }
 
 body {
