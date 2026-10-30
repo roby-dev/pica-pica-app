@@ -221,3 +221,22 @@ describe('ExpensesStore.importMany', () => {
     expect(store.all().length).toBe(1);
   });
 });
+
+describe('ExpensesStore ordering', () => {
+  it('keeps the list newest-occurred first when adding a back-dated expense', async () => {
+    const { store } = await setup();
+    await store.add(command({ what: 'Hoy', occurredAt: '2026-10-30T08:00:00-05:00' }));
+    await store.add(command({ what: 'Ayer', occurredAt: '2026-10-29T08:00:00-05:00' }));
+    await store.add(command({ what: 'Hoy tarde', occurredAt: '2026-10-30T12:00:00-05:00' }));
+    expect(store.all().map((e) => e.what)).toEqual(['Hoy tarde', 'Hoy', 'Ayer']);
+  });
+
+  it('re-sorts when an expense changes date', async () => {
+    const { store } = await setup();
+    const first = await store.add(command({ what: 'A', occurredAt: '2026-10-30T08:00:00-05:00' }));
+    await store.add(command({ what: 'B', occurredAt: '2026-10-29T08:00:00-05:00' }));
+    if (!first.ok) throw first.error;
+    await store.update(first.value.id, command({ what: 'A', occurredAt: '2026-10-20T08:00:00-05:00' }));
+    expect(store.all().map((e) => e.what)).toEqual(['B', 'A']);
+  });
+});

@@ -186,7 +186,7 @@ export class ExpensesStore {
     value: T,
   ): Promise<Result<T, DomainError>> {
     const previous = this.all();
-    this.loaded.set(next);
+    this.loaded.set(newestFirst(next));
     try {
       await persist();
       return ok(value);
@@ -196,6 +196,10 @@ export class ExpensesStore {
     }
   }
 }
+
+/** Same order the repository answers with, so a new or edited expense lands where its date says. */
+const newestFirst = (expenses: readonly Expense[]): readonly Expense[] =>
+  [...expenses].sort((a, b) => Date.parse(b.occurredAt) - Date.parse(a.occurredAt));
 
 /** Distinct non-empty values in order of most recent use. */
 function recent(expenses: readonly Expense[], pick: (e: Expense) => string | null): readonly string[] {
