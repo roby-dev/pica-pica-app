@@ -24,7 +24,7 @@ export interface TabItem {
       @for (item of items(); track item.path) {
         <a
           [routerLink]="item.path"
-          routerLinkActive="bg-white/70 text-ink"
+          routerLinkActive="bg-accent text-on-accent"
           class="flex min-h-14 flex-1 flex-col items-center justify-center gap-0.5 rounded-[1.25rem] text-[11px] font-semibold text-ink-muted transition active:scale-95"
           [attr.tabindex]="hidden() ? -1 : null"
         >

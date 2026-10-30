@@ -3,7 +3,7 @@ import { DestroyRef, Injectable, effect, inject, signal } from '@angular/core';
 import { SettingsStore } from '@pp/settings';
 
 const LIGHT_COLOR = '#f4f7fb';
-const DARK_COLOR = '#1f1e30';
+const DARK_COLOR = '#17151f';
 const STORAGE_KEY = 'pp-theme';
 
 /**

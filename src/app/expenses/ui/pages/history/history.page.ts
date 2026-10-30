@@ -15,7 +15,7 @@ import { filterHistory, toDayGroups } from './history-view';
     <pp-app-header title="Historial" subtitle="Tus gastos por día" />
     <div class="flex flex-col gap-4 px-4 pb-6">
       <pp-search-bar placeholder="Buscar gasto, lugar o nota" [(query)]="query" />
-      <div class="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1" role="group" aria-label="Filtrar por categoría">
+      <div class="scroll-row" role="group" aria-label="Filtrar por categoría">
         @for (category of catalog.categories(); track category.id) {
           <pp-chip
             [label]="category.name"

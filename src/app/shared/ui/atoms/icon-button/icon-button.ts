@@ -5,7 +5,7 @@ export type IconButtonVariant = 'ghost' | 'primary' | 'danger';
 
 const VARIANT_CLASS: Record<IconButtonVariant, string> = {
   ghost: 'glass text-ink',
-  primary: 'bg-accent text-ink',
+  primary: 'bg-accent text-on-accent',
   danger: 'bg-danger text-white',
 };
 

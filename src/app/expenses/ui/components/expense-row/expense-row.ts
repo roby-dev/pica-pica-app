@@ -8,7 +8,6 @@ export interface ExpenseRowVm {
   readonly what: string;
   readonly money: Money;
   readonly categoryEmoji: string;
-  readonly categoryColor: string;
   readonly place: string | null;
   readonly methodName: string;
   readonly timeLabel: string;
@@ -22,13 +21,12 @@ export interface ExpenseRowVm {
     <div class="flex items-center gap-1">
       <button
         type="button"
-        class="flex min-h-14 min-w-0 flex-1 items-center gap-3 rounded-2xl px-1 py-2 text-left active:bg-white/40"
+        class="flex min-h-14 min-w-0 flex-1 items-center gap-3 rounded-2xl px-1 py-2 text-left active:bg-ink/10"
         [attr.aria-label]="'Editar ' + row().what"
         (click)="opened.emit(row().id)"
       >
         <span
-          class="grid size-11 shrink-0 place-items-center rounded-2xl text-xl"
-          [style.background-color]="row().categoryColor"
+          class="grid size-11 shrink-0 place-items-center rounded-full border-[0.5px] border-chip-border bg-chip text-xl"
           aria-hidden="true"
           >{{ row().categoryEmoji }}</span
         >

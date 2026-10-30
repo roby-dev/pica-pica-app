@@ -7,7 +7,7 @@ import { ChangeDetectionStrategy, Component, input, output } from '@angular/core
     <button
       type="button"
       class="inline-flex min-h-11 items-center gap-1.5 rounded-pill border-[0.5px] px-4 text-[15px] font-medium transition active:scale-95"
-      [class]="selected() ? 'border-transparent bg-accent font-semibold text-ink' : 'border-white/70 bg-white/40 text-ink'"
+      [class]="selected() ? 'border-transparent bg-accent font-semibold text-on-accent' : 'border-chip-border bg-chip text-ink'"
       [style.background-color]="selected() && color() ? color() : null"
       [attr.aria-pressed]="selected()"
       (click)="toggled.emit(!selected())"
@@ -19,7 +19,7 @@ import { ChangeDetectionStrategy, Component, input, output } from '@angular/core
     </button>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  host: { class: 'inline-flex' },
+  host: { class: 'inline-flex shrink-0' },
 })
 export class Chip {
   readonly label = input.required<string>();

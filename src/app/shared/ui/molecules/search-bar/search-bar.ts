@@ -22,7 +22,7 @@ import { Icon } from '../../atoms/icon/icon';
       @if (query()) {
         <button
           type="button"
-          class="grid size-8 place-items-center rounded-full text-ink-muted active:bg-white/50"
+          class="grid size-8 place-items-center rounded-full text-ink-muted active:bg-ink/10"
           aria-label="Borrar búsqueda"
           (click)="query.set('')"
         >

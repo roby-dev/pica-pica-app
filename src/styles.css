@@ -2,24 +2,31 @@
 @import 'tailwindcss';
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 
-/* Palette: matte pastels. Powder blue accent, peach secondary, ink in slate indigo. */
+/* Tokens. Light is the soft pastel look; dark (the default) is a violet-to-coral glow with near-black cards,
+   a lime accent and a white call-to-action. Components only use these names, never raw colors. */
 @theme {
   --font-sans: 'Manrope Variable', system-ui, sans-serif;
   --color-accent: oklch(0.82 0.08 255);
   --color-accent-strong: oklch(0.7 0.11 262);
   --color-accent-2: oklch(0.87 0.07 55);
   --color-danger: oklch(0.73 0.11 20);
+  --color-danger-text: oklch(0.5 0.15 20);
   --color-ink: oklch(0.3 0.04 265);
   --color-ink-muted: oklch(0.52 0.03 265);
-  --radius-glass: 1.25rem;
+  --color-on-accent: oklch(0.25 0.04 265);
+  --color-cta: oklch(0.82 0.08 255);
+  --color-on-cta: oklch(0.25 0.04 265);
+  --color-chip: rgb(255 255 255 / 0.4);
+  --color-chip-border: rgb(255 255 255 / 0.7);
+  --color-link: oklch(0.45 0.12 262);
+  --radius-glass: 1.5rem;
   --radius-pill: 999px;
   --blur-glass: 24px;
   --blur-glass-strong: 32px;
-  --shadow-glass:
-    0 6px 24px -10px rgb(80 90 140 / 0.28), inset 0 1px 0 rgb(255 255 255 / 0.6);
 }
 
 :root {
+  --shadow-glass: 0 6px 24px -10px rgb(80 90 140 / 0.28), inset 0 1px 0 rgb(255 255 255 / 0.6);
   --glass-bg: rgb(255 255 255 / 0.6);
   --glass-bg-strong: rgb(255 255 255 / 0.78);
   --glass-border: rgb(255 255 255 / 0.75);
@@ -33,20 +40,53 @@
 }
 
 [data-theme='dark'] {
-  --color-ink: oklch(0.94 0.015 270);
-  --color-ink-muted: oklch(0.72 0.03 270);
-  --glass-bg: rgb(52 50 76 / 0.5);
-  --glass-bg-strong: rgb(52 50 76 / 0.7);
-  --glass-border: rgb(255 255 255 / 0.14);
-  --glass-sat: 110%;
-  --glass-fallback: rgb(40 38 62 / 0.96);
+  --color-accent: oklch(0.94 0.16 112);
+  --color-accent-strong: oklch(0.88 0.17 112);
+  --color-accent-2: oklch(0.74 0.1 40);
+  --color-danger: oklch(0.68 0.16 22);
+  --color-danger-text: oklch(0.8 0.12 22);
+  --color-ink: oklch(0.98 0.004 290);
+  --color-ink-muted: oklch(0.76 0.02 290);
+  --color-on-accent: oklch(0.22 0.03 280);
+  --color-cta: oklch(0.99 0 0);
+  --color-on-cta: oklch(0.2 0.03 280);
+  --color-chip: rgb(255 255 255 / 0.08);
+  --color-chip-border: rgb(255 255 255 / 0.14);
+  --color-link: oklch(0.94 0.16 112);
+  --shadow-glass: 0 12px 32px -16px rgb(0 0 0 / 0.7), inset 0 1px 0 rgb(255 255 255 / 0.07);
+  --glass-bg: rgb(22 20 34 / 0.55);
+  --glass-bg-strong: rgb(22 20 34 / 0.84);
+  --glass-border: rgb(255 255 255 / 0.1);
+  --glass-sat: 120%;
+  --glass-fallback: rgb(26 24 40 / 0.97);
   --app-bg:
-    radial-gradient(60% 50% at 8% 0%, oklch(0.4 0.07 20 / 0.7), transparent 70%),
-    radial-gradient(55% 45% at 100% 15%, oklch(0.4 0.08 262 / 0.75), transparent 70%),
-    oklch(0.21 0.03 275);
+    radial-gradient(80% 36% at 35% 0%, oklch(0.52 0.11 295 / 0.95), transparent 72%),
+    radial-gradient(55% 30% at 100% 4%, oklch(0.7 0.12 40 / 0.85), transparent 72%),
+    radial-gradient(60% 34% at 0% 14%, oklch(0.32 0.07 280 / 0.9), transparent 70%),
+    oklch(0.17 0.02 285);
 }
 
 @layer components {
+  /* One-line row of chips that scrolls sideways with no visible scrollbar; bleeds to the screen edges. */
+  .scroll-row {
+    display: flex;
+    gap: 0.5rem;
+    margin-inline: -1rem;
+    padding-inline: 1rem;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x proximity;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .scroll-row::-webkit-scrollbar {
+    display: none;
+  }
+  .scroll-row > * {
+    flex-shrink: 0;
+    scroll-snap-align: start;
+  }
+
   .glass,
   .glass-strong {
     background: var(--glass-bg);

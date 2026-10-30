@@ -7,7 +7,7 @@ import { Icon, type IconName } from '../../atoms/icon/icon';
   imports: [Icon, Button],
   template: `
     <div class="glass flex flex-col items-center gap-3 px-6 py-10 text-center">
-      <span class="grid size-14 place-items-center rounded-full bg-white/60 text-ink-muted">
+      <span class="grid size-14 place-items-center rounded-full bg-chip text-ink-muted">
         <pp-icon [name]="icon()" [size]="28" />
       </span>
       <h2 class="text-lg font-bold text-ink">{{ title() }}</h2>

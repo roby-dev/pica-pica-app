@@ -35,7 +35,7 @@ const MESSAGES: Record<FormError, string> = {
   imports: [AmountInput, Button, CategoryPicker, Chip, DateTimeField, MethodPicker, PlaceField, TextField],
   template: `
     <form class="flex flex-col gap-5" novalidate (submit)="$event.preventDefault(); submit()">
-      <div class="glass-strong flex flex-col items-center gap-1 px-4 py-6">
+      <div class="glass-strong flex flex-col items-center gap-1 px-4 py-4">
         <pp-amount-input
           [currency]="activeCurrency()"
           [autofocus]="autofocus()"
@@ -43,7 +43,7 @@ const MESSAGES: Record<FormError, string> = {
           (submitted)="submit()"
         />
         @if (showError('amount')) {
-          <span class="text-sm text-[oklch(0.5_0.15_20)]" role="alert">{{ messages.amount }}</span>
+          <span class="text-sm text-danger-text" role="alert">{{ messages.amount }}</span>
         }
         <button
           type="button"
@@ -70,7 +70,7 @@ const MESSAGES: Record<FormError, string> = {
           [(value)]="what"
         />
         @if (whatSuggestions().length > 0) {
-          <div class="flex flex-wrap gap-2">
+          <div class="scroll-row">
             @for (item of whatSuggestions(); track item) {
               <pp-chip [label]="item" [selected]="what() === item" (toggled)="what.set($event ? item : '')" />
             }
@@ -81,14 +81,14 @@ const MESSAGES: Record<FormError, string> = {
       <div class="flex flex-col gap-1">
         <pp-category-picker [categories]="categories()" [(selectedId)]="categoryId" />
         @if (showError('category')) {
-          <span class="px-1 text-sm text-[oklch(0.5_0.15_20)]" role="alert">{{ messages.category }}</span>
+          <span class="px-1 text-sm text-danger-text" role="alert">{{ messages.category }}</span>
         }
       </div>
 
       <div class="flex flex-col gap-1">
         <pp-method-picker [methods]="methods()" [(selectedId)]="methodId" />
         @if (showError('method')) {
-          <span class="px-1 text-sm text-[oklch(0.5_0.15_20)]" role="alert">{{ messages.method }}</span>
+          <span class="px-1 text-sm text-danger-text" role="alert">{{ messages.method }}</span>
         }
       </div>
 
@@ -110,10 +110,13 @@ const MESSAGES: Record<FormError, string> = {
       </div>
 
       @if (serverError()) {
-        <p class="text-center text-sm text-[oklch(0.5_0.15_20)]" role="alert">{{ serverError() }}</p>
+        <p class="text-center text-sm text-danger-text" role="alert">{{ serverError() }}</p>
       }
 
-      <div class="flex gap-3">
+      <div
+        class="glass sticky z-10 flex gap-3 p-2"
+        style="bottom: calc(env(safe-area-inset-bottom) + var(--pp-bottom-offset, 88px))"
+      >
         @if (cancellable()) {
           <pp-button variant="ghost" size="lg" (pressed)="cancelled.emit()">Cancelar</pp-button>
         }

@@ -5,7 +5,7 @@ export type ButtonSize = 'md' | 'lg';
 
 const VARIANT_CLASS: Record<ButtonVariant, string> = {
   primary:
-    'bg-linear-to-br from-accent to-[oklch(0.85_0.07_300)] text-ink shadow-[0_10px_22px_-12px_var(--color-accent-strong)]',
+    'bg-cta text-on-cta shadow-[0_10px_22px_-12px_var(--color-accent-strong)]',
   ghost: 'glass text-ink',
   danger: 'bg-danger text-white',
 };

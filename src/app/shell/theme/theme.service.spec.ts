@@ -16,7 +16,7 @@ describe('ThemeService', () => {
     await vi.waitFor(() => expect(settings.ready()).toBe(true));
     await settings.update({ theme: 'dark' });
     await vi.waitFor(() => expect(document.documentElement.getAttribute('data-theme')).toBe('dark'));
-    expect(document.querySelector('meta[name="theme-color"]')!.getAttribute('content')).toBe('#1f1e30');
+    expect(document.querySelector('meta[name="theme-color"]')!.getAttribute('content')).toBe('#17151f');
     expect(localStorage.getItem('pp-theme')).toBe('dark');
   });
 
@@ -34,6 +34,7 @@ describe('ThemeService', () => {
     const settings = TestBed.inject(SettingsStore);
     TestBed.inject(ThemeService);
     await vi.waitFor(() => expect(settings.ready()).toBe(true));
+    await settings.update({ theme: 'system' });
     await vi.waitFor(() => expect(document.documentElement.getAttribute('data-theme')).toBe('light'));
     expect(localStorage.getItem('pp-theme')).toBe('system');
   });

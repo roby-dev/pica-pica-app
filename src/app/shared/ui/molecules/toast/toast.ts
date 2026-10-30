@@ -9,7 +9,7 @@ import { ChangeDetectionStrategy, Component, effect, input, output } from '@angu
       @if (actionLabel()) {
         <button
           type="button"
-          class="min-h-11 rounded-full px-4 font-semibold text-[oklch(0.45_0.12_262)] active:bg-white/50"
+          class="min-h-11 rounded-full px-4 font-semibold text-link active:bg-ink/10"
           (click)="action.emit()"
         >
           {{ actionLabel() }}

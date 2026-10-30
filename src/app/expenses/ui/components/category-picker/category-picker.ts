@@ -10,7 +10,7 @@ import type { CategoryId } from '../../../domain/ids';
   template: `
     <div class="flex flex-col gap-1.5">
       <span class="px-1 text-sm font-medium text-ink-muted" id="pp-category-label">Categoría</span>
-      <div class="flex flex-wrap gap-2" role="group" aria-labelledby="pp-category-label">
+      <div class="scroll-row" role="group" aria-labelledby="pp-category-label">
         @for (category of categories(); track category.id) {
           <pp-chip
             [label]="category.name"

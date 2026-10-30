@@ -15,7 +15,7 @@ export interface SegmentOption {
           type="button"
           role="radio"
           class="min-h-10 flex-1 rounded-full px-3 text-sm font-semibold transition"
-          [class]="option.value === value() ? 'bg-white/90 text-ink shadow-sm' : 'text-ink-muted'"
+          [class]="option.value === value() ? 'bg-accent text-on-accent shadow-sm' : 'text-ink-muted'"
           [attr.aria-checked]="option.value === value()"
           (click)="value.set(option.value)"
         >

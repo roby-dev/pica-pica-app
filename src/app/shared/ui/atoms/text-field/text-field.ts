@@ -25,7 +25,7 @@ type InputMode = 'text' | 'search' | 'decimal' | 'numeric' | 'email';
         (blur)="blurred.emit()"
       />
       @if (error()) {
-        <span class="px-1 text-sm text-[oklch(0.5_0.15_20)]" [id]="inputId + '-error'" role="alert">
+        <span class="px-1 text-sm text-danger-text" [id]="inputId + '-error'" role="alert">
           {{ error() }}
         </span>
       }

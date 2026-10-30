@@ -14,7 +14,7 @@ describe('defaultSettings', () => {
     expect(settings.defaultCurrency).toBe('PEN');
     expect(settings.antExpenseThreshold).toEqual({ amountMinor: 2000, currency: 'PEN' });
     expect(settings.weekStartsOn).toBe(1);
-    expect(settings.theme).toBe('system');
+    expect(settings.theme).toBe('dark');
   });
 });
 
@@ -65,7 +65,7 @@ describe('applySettingsPatch', () => {
 
   it('does not mutate the current settings', () => {
     const current = defaultSettings();
-    applySettingsPatch(current, { theme: 'dark' });
-    expect(current.theme).toBe('system');
+    applySettingsPatch(current, { theme: 'light' });
+    expect(current.theme).toBe('dark');
   });
 });

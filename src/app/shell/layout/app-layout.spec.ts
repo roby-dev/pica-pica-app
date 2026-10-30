@@ -27,7 +27,8 @@ describe('AppLayout and routes', () => {
     const harness = await boot('/');
     const root = harness.routeNativeElement!.ownerDocument.body;
     expect(TestBed.inject(Router).url).toBe('/add');
-    expect(text(root)).toContain('Registra un gasto hormiga');
+    expect(text(root)).toContain('Hoy');
+    expect(text(root)).not.toContain('Registra un gasto hormiga');
   });
 
   it('renders the four tabs in order', async () => {

@@ -2,17 +2,20 @@ import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { TabBar, Toast, ToastService } from '@pp/shared/ui';
 import { TAB_ITEMS } from '../navigation/tab-items';
+import { SwipeNav } from '../navigation/swipe-nav';
 import { KeyboardService } from './keyboard.service';
 
 /** The app frame: background, page outlet, floating tab bar and toast host. */
 @Component({
   selector: 'pp-app-layout',
-  imports: [RouterOutlet, TabBar, Toast],
+  imports: [RouterOutlet, SwipeNav, TabBar, Toast],
   template: `
     <div class="app-bg"></div>
     <main
+      ppSwipeNav
       class="mx-auto w-full max-w-md px-4"
       style="padding-bottom: calc(env(safe-area-inset-bottom) + 104px)"
+      [style.--pp-bottom-offset]="keyboard.open() ? '8px' : '88px'"
     >
       <router-outlet />
     </main>

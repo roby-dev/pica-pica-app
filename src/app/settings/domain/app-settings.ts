@@ -20,7 +20,7 @@ export function defaultSettings(): AppSettings {
   return {
     defaultCurrency: DEFAULT_CURRENCY,
     antExpenseThreshold: Money.of(DEFAULT_ANT_THRESHOLD_MAJOR, DEFAULT_CURRENCY),
-    theme: 'system',
+    theme: 'dark',
     weekStartsOn: 1,
     lastBackupAt: null,
   };

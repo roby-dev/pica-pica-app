@@ -3,8 +3,8 @@ import { ChangeDetectionStrategy, Component, computed, input } from '@angular/co
 export type BadgeTone = 'up' | 'down' | 'neutral';
 
 const TONE_CLASS: Record<BadgeTone, string> = {
-  up: 'bg-[oklch(0.9_0.06_20)] text-[oklch(0.42_0.12_20)]',
-  down: 'bg-[oklch(0.91_0.06_165)] text-[oklch(0.4_0.08_165)]',
+  up: 'bg-[oklch(0.9_0.06_20)] text-[oklch(0.42_0.12_20)] dark:bg-[oklch(0.36_0.08_20)] dark:text-[oklch(0.86_0.1_20)]',
+  down: 'bg-[oklch(0.91_0.06_165)] text-[oklch(0.4_0.08_165)] dark:bg-[oklch(0.36_0.07_165)] dark:text-[oklch(0.86_0.12_160)]',
   neutral: 'bg-ink/10 text-ink-muted',
 };
 

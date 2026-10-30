@@ -1,16 +1,15 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal, viewChild } from '@angular/core';
 import { totalFor } from '@pp/shared/kernel';
-import { AppHeader, StatCard, ToastService } from '@pp/shared/ui';
+import { StatCard, ToastService } from '@pp/shared/ui';
 import { CatalogStore } from '../../../application/catalog.store';
 import { ExpensesStore } from '../../../application/expenses.store';
 import { ExpenseForm, type ExpenseFormValue } from '../../components/expense-form/expense-form';
 
 @Component({
   selector: 'pp-quick-add-page',
-  imports: [AppHeader, ExpenseForm, StatCard],
+  imports: [ExpenseForm, StatCard],
   template: `
-    <pp-app-header title="Agregar" subtitle="Registra un gasto hormiga" />
-    <div class="flex flex-col gap-5 px-4 pb-6">
+    <div class="flex flex-col gap-5 px-4 pb-6 pt-4">
       <div class="grid grid-cols-2 gap-3">
         <pp-stat-card label="Hoy" [money]="today()" />
         <pp-stat-card label="Esta semana" [money]="week()" />
