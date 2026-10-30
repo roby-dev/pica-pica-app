@@ -17,7 +17,7 @@ Spec source of truth: `docs/architecture.md` (read it fully; section 11 lists wo
 - [x] T3 WU-03 Tailwind v4 + tokens — inline — built CSS has -webkit-backdrop-filter, data-theme dark, .app-bg
 - [x] T4 WU-04 Shared kernel — inline — 14 kernel specs, lint clean, build OK
 - [x] T5 WU-05 shared/ui atoms A — inline — 10 specs, lint clean, build OK, touch targets >=44px
-- [ ] T6 WU-06 shared/ui atoms B
+- [x] T6 WU-06 shared/ui atoms B — inline — 57 tests total, lint clean, build OK, parse cases incl. 20,50 and 1,250.50
 - [ ] T7 WU-07 shared/persistence
 - [ ] T8 WU-08 settings core
 - [ ] T9 WU-09 expenses domain
