@@ -38,12 +38,15 @@ jobs:
       # Nothing broken gets published.
       - run: pnpm lint
       - run: pnpm lint:verify
+
       # On failure, surface the error lines as annotations: they stay readable without opening the raw log.
       - name: Test
+        env:
+          NO_COLOR: '1'
         run: |
           set -o pipefail
           pnpm test 2>&1 | tee test.log || {
-            sed 's/\[[0-9;]*m//g' test.log | grep -E 'FAIL|Error|AssertionError|expected|Timeout' | head -40 | sed 's/^/::error::/'
+            grep -E 'FAIL|Error|AssertionError|expected|Timeout' test.log | head -40 | sed 's/^/::error::/'
             exit 1
           }
 
