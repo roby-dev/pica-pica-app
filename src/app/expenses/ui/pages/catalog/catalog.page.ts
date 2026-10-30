@@ -34,24 +34,20 @@ type Kind = 'category' | 'method';
                     <pp-button (pressed)="save(section.kind, item.id)">Guardar</pp-button>
                   </div>
                 } @else {
-                  <div class="flex items-center gap-2">
-                    <button
-                      type="button"
-                      class="min-h-12 min-w-0 flex-1 truncate text-left text-base font-semibold text-ink"
-                      [class.opacity-50]="item.archived"
-                      [attr.aria-label]="'Renombrar ' + item.name"
-                      (click)="edit(item)"
-                    >
-                      {{ item.name }}
-                    </button>
-                    <div class="w-40 shrink-0">
-                      <pp-toggle
-                        label="Visible"
-                        [checked]="!item.archived"
-                        (checkedChange)="setVisible(section.kind, item.id, $event)"
-                      />
-                    </div>
-                  </div>
+                  <button
+                    type="button"
+                    class="min-h-12 w-full truncate text-left text-base font-semibold text-ink"
+                    [class.opacity-50]="item.archived"
+                    [attr.aria-label]="'Renombrar ' + item.name"
+                    (click)="edit(item)"
+                  >
+                    {{ item.name }}
+                  </button>
+                  <pp-toggle
+                    label="Visible"
+                    [checked]="!item.archived"
+                    (checkedChange)="setVisible(section.kind, item.id, $event)"
+                  />
                   @if (section.kind === 'category') {
                     <pp-toggle
                       label="Cuenta como hormiga"
