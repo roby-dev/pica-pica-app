@@ -14,7 +14,7 @@ Spec source of truth: `docs/architecture.md` (read it fully; section 11 lists wo
 ## Tasks
 - [x] T1 WU-01 Scaffold (S1,S4) — inline — test 2/2, build OK, no zone.js
 - [x] T2 WU-02 Aliases + boundaries lint — inline — lint clean, lint:verify 7/7, test+build OK
-- [ ] T3 WU-03 Tailwind v4 + tokens
+- [x] T3 WU-03 Tailwind v4 + tokens — inline — built CSS has -webkit-backdrop-filter, data-theme dark, .app-bg
 - [ ] T4 WU-04 Shared kernel
 - [ ] T5 WU-05 shared/ui atoms A
 - [ ] T6 WU-06 shared/ui atoms B
