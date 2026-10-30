@@ -7,6 +7,7 @@ import {
   provideZonelessChangeDetection,
 } from '@angular/core';
 import { provideRouter } from '@angular/router';
+import { provideExpenses } from '@pp/expenses';
 import { provideSettings } from '@pp/settings';
 import { provideShared } from '@pp/shared/di';
 import { routes } from './app.routes';
@@ -20,6 +21,7 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes),
     provideShared(),
     provideSettings({ persistence: 'indexeddb' }),
+    provideExpenses({ persistence: 'indexeddb' }),
     { provide: LOCALE_ID, useValue: 'es-PE' },
   ],
 };

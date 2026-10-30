@@ -1,3 +1,11 @@
+export { CATALOG_REPOSITORY, type CatalogRepository } from './application/ports/catalog.repository';
+export {
+  EXPENSE_REPOSITORY,
+  filterExpenses,
+  type ExpenseQuery,
+  type ExpenseRepository,
+} from './application/ports/expense.repository';
+export { provideExpenses, type ExpensesOptions } from './expenses.providers';
 export { SEED_CATEGORIES, SEED_PAYMENT_METHODS } from './domain/catalog.seeds';
 export {
   ensurePickable,

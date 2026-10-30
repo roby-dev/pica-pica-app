@@ -21,7 +21,7 @@ Spec source of truth: `docs/architecture.md` (read it fully; section 11 lists wo
 - [x] T7 WU-07 shared/persistence — inline — 64 tests, lint clean, build OK; added shared/di (tokens + provideShared)
 - [x] T8 WU-08 settings core — inline — 84 tests, lint clean, build OK; defaults on empty DB, currency change without threshold rejected
 - [x] T9 WU-09 expenses domain — inline — 113 tests, lint clean, build OK; rules 1,2,6,7 covered
-- [ ] T10 WU-10 expenses ports + adapters
+- [x] T10 WU-10 expenses ports + adapters — inline — 143 tests, contract suite green on memory+IndexedDB, lint clean, build OK; added Category/PaymentMethod.position
 - [ ] T11 WU-11 expenses stores + use cases
 - [ ] T12 WU-12 shell + molecules/organisms
 - [ ] T13 WU-13 quick-add

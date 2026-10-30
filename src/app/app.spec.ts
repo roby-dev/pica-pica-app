@@ -1,3 +1,4 @@
+import 'fake-indexeddb/auto';
 import { LOCALE_ID } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { App } from './app';

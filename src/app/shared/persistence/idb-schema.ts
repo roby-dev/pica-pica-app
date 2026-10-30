@@ -27,6 +27,7 @@ export interface CategoryRecord {
   emoji: string;
   color: string;
   archived: boolean;
+  position: number;
 }
 
 export interface PaymentMethodRecord {
@@ -34,6 +35,7 @@ export interface PaymentMethodRecord {
   name: string;
   kind: string;
   archived: boolean;
+  position: number;
 }
 
 export interface SettingsRecord {

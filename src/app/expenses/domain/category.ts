@@ -9,6 +9,8 @@ export interface Category {
   /** Any CSS color; pastel tones that sit well on glass. */
   readonly color: string;
   readonly archived: boolean;
+  /** Display order, ascending. */
+  readonly position: number;
 }
 
 export type PaymentMethodKind = 'cash' | 'debit' | 'credit' | 'transfer' | 'wallet' | 'other';
@@ -18,6 +20,7 @@ export interface PaymentMethod {
   readonly name: string;
   readonly kind: PaymentMethodKind;
   readonly archived: boolean;
+  readonly position: number;
 }
 
 /** Rule 6: archived items cannot be picked for new expenses. */
