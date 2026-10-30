@@ -27,7 +27,7 @@ Spec source of truth: `docs/architecture.md` (read it fully; section 11 lists wo
 - [x] T13 WU-13 quick-add
 - [x] T14 WU-14 history + edit
 - [x] T15 WU-15 insights domain
-- [ ] T16 WU-16 insights store + page
+- [x] T16 WU-16 insights store + page
 - [ ] T17 WU-17 settings UI + catalog
 - [ ] T18 WU-18 backup
 - [ ] T19 WU-19 PWA

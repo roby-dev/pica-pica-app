@@ -3,6 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
 import { provideExpenses } from '@pp/expenses';
+import { provideInsights } from '@pp/insights';
 import { provideSettings } from '@pp/settings';
 import { ToastService } from '@pp/shared/ui';
 import { routes } from '../../app.routes';
@@ -16,6 +17,7 @@ async function boot(url = '/') {
       provideRouter(routes),
       provideSettings({ persistence: 'memory' }),
       provideExpenses({ persistence: 'memory' }),
+      provideInsights(),
     ],
   });
   const harness = await RouterTestingHarness.create(url);
