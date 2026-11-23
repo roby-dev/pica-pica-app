@@ -37,3 +37,14 @@ Spec source of truth: `docs/architecture.md` (read it fully; section 11 lists wo
 - L1 (user, verbatim): "neceisto crear un sistema web, angular , ultima version, usando tailwind pnpm. full signals, sin zone,js, que pueda admimtr PWA para correrlo en mi celular (osae se qque sea mobile first) para aplicar gastos hormiga,s usa diseño usando glasmorfismo. (Porque lo usare en mi ios y tienequ e verse implecable)." / "armamos la arteqictura con opus sus web compoentes,. y luego implem,entaos con sonnet"
 - L2 (user, 2026-10-30): "moneda local PEN , semana empiza en lunes. sin zone.js, umbral no entiendo, pero si edberia poder hgacer multi m,oneda (feature futuro)... mejor como screamming architecture"
 - L3 (user): "Está bien como lo propone" (currency picker hidden behind "Cambiar moneda").
+- L4 (2026-11-23, T20 polish, UX + intelligence), all inline, each committed and pushed to main:
+  - 01a99b2 quick-add: one-tap "Recientes" presets (autofill amount/currency/category/method/place), +1/+2/+5/+10 steps, keypad closes after tiles/chips.
+  - 5ae71f4 presets ranked by habit: recency (14-day half-life) x closeness to current hour x same weekday/weekend type (`expenses/domain/preset-ranking.ts`).
+  - 4d53c3d LiveClock (`shared/di/live-clock.ts`): derived "now" re-read on visibilitychange, because an iOS PWA resumes without reloading.
+  - 2c40835 custom payment methods ("Agregar método", name + type) so each card is its own method. User (verbatim): "no creoq ue esae neceairo lo de ultimos 4 digitos. pero si me agreda tu idea".
+  - 8c949d5 insights: yearly cost per ant habit = total / elapsed days x 365, hidden under 7 elapsed days.
+  - f8800e5 CI fix: runner is UTC; time-dependent tests must build dates in local time. Check with `TZ=UTC pnpm ng test --watch=false`.
+  - a6d6a01 presets grouped ignoring case/spaces, matching the insights habit counter (accents still distinguish).
+  - Evidence: 367 tests green in UTC and America/Lima, lint clean, build OK, Pages deploy green from f8800e5.
+- L5 (2026-11-23) Next, pending a user decision: import Yape "ReporteTransacciones" .xlsx (sheet "Movimientos", header row 5: Tipo de Transacción, Origen, Destino, Monto [string], Mensaje [mostly empty], Fecha de operación [dd/MM/yyyy HH:mm:ss]; file has broken accents such as "TE PAG�"). Proposal: import only PAGASTE, skip "SIP - " self-transfers, method Yape/Plin, Destino as place, deterministic id from date+amount+destino for dedupe, read xlsx without a dependency (DecompressionStream). Open question to the user: classify by learning from the destination (recommended) or send everything to "Otros".
+- L6 Remaining backlog ideas: autocomplete on typing, "Repetir" from history, PWA shortcuts (T19), spend deviation alerts, price changes per item/place, hour x weekday heatmap.
