@@ -1,8 +1,9 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { AppHeader, Button, TextField, ToastService, Toggle } from '@pp/shared/ui';
+import { AppHeader, Button, Chip, TextField, ToastService, Toggle } from '@pp/shared/ui';
 import { CatalogStore } from '../../../application/catalog.store';
-import { countsAsAnt } from '../../../domain/category';
+import { countsAsAnt, type PaymentMethodKind } from '../../../domain/category';
+import { ExpensePersistenceError } from '../../../domain/expense.errors';
 
 interface Item {
   readonly id: string;
@@ -14,12 +15,28 @@ interface Item {
 
 type Kind = 'category' | 'method';
 
-/** Rename and archive categories and payment methods. Archived items stay valid on old expenses. */
+/** Cards first: telling them apart is the usual reason to add a method. */
+const KIND_OPTIONS: readonly { readonly kind: PaymentMethodKind; readonly label: string }[] = [
+  { kind: 'credit', label: 'Crédito' },
+  { kind: 'debit', label: 'Débito' },
+  { kind: 'wallet', label: 'Billetera' },
+  { kind: 'cash', label: 'Efectivo' },
+  { kind: 'transfer', label: 'Transferencia' },
+  { kind: 'other', label: 'Otro' },
+];
+
+const nameMessage = (message: string): string =>
+  message === 'That name is already in use' ? 'Ese nombre ya existe' : 'Usa de 1 a 24 caracteres';
+
+/**
+ * Rename and archive categories and payment methods, and add payment methods such as specific cards.
+ * Archived items stay valid on old expenses.
+ */
 @Component({
   selector: 'pp-catalog-page',
-  imports: [AppHeader, Button, TextField, Toggle],
+  imports: [AppHeader, Button, Chip, TextField, Toggle],
   template: `
-    <pp-app-header title="Categorías y métodos" subtitle="Renombra u oculta" [showBack]="true" (back)="back()" />
+    <pp-app-header title="Categorías y métodos" subtitle="Renombra, oculta o agrega tus tarjetas" [showBack]="true" (back)="back()" />
     <div class="flex flex-col gap-5 pb-6">
       @for (section of sections(); track section.kind) {
         <section class="flex flex-col gap-2" [attr.aria-label]="section.title">
@@ -59,6 +76,37 @@ type Kind = 'category' | 'method';
               </div>
             }
           </div>
+          @if (section.kind === 'method') {
+            @if (adding()) {
+              <div class="glass flex flex-col gap-3 p-3" data-testid="new-method">
+                <pp-text-field
+                  label="Nombre"
+                  placeholder="Ej. Visa BCP"
+                  [maxLength]="24"
+                  [error]="addError()"
+                  [(value)]="newName"
+                />
+                <div class="flex flex-col gap-1.5" role="group" aria-label="Tipo de método">
+                  <span class="px-1 text-sm font-medium text-ink-muted">Tipo</span>
+                  <div class="flex flex-wrap gap-2">
+                    @for (option of kindOptions; track option.kind) {
+                      <pp-chip
+                        [label]="option.label"
+                        [selected]="newKind() === option.kind"
+                        (toggled)="newKind.set(option.kind)"
+                      />
+                    }
+                  </div>
+                </div>
+                <div class="flex gap-2">
+                  <pp-button variant="ghost" (pressed)="adding.set(false)">Cancelar</pp-button>
+                  <pp-button (pressed)="addMethod()">Agregar</pp-button>
+                </div>
+              </div>
+            } @else {
+              <pp-button variant="ghost" (pressed)="startAdding()">Agregar método</pp-button>
+            }
+          }
         </section>
       }
     </div>
@@ -73,6 +121,12 @@ export class CatalogPage {
   protected readonly editing = signal<string | null>(null);
   protected readonly draft = signal('');
   protected readonly error = signal<string | null>(null);
+
+  protected readonly kindOptions = KIND_OPTIONS;
+  protected readonly adding = signal(false);
+  protected readonly newName = signal('');
+  protected readonly newKind = signal<PaymentMethodKind>('credit');
+  protected readonly addError = signal<string | null>(null);
 
   protected readonly sections = computed<readonly { kind: Kind; title: string; items: readonly Item[] }[]>(() => [
     { kind: 'category', title: 'Categorías', items: this.catalog.categories().map((c) => ({ ...c, antSpending: countsAsAnt(c) })) },
@@ -95,7 +149,20 @@ export class CatalogPage {
         ? await this.catalog.renameCategory(id as never, this.draft())
         : await this.catalog.renameMethod(id as never, this.draft());
     if (result.ok) this.editing.set(null);
-    else this.error.set(result.error.message === 'That name is already in use' ? 'Ese nombre ya existe' : 'Usa de 1 a 24 caracteres');
+    else this.error.set(nameMessage(result.error.message));
+  }
+
+  protected startAdding(): void {
+    this.newName.set('');
+    this.newKind.set('credit');
+    this.addError.set(null);
+    this.adding.set(true);
+  }
+
+  protected async addMethod(): Promise<void> {
+    const result = await this.catalog.addMethod(this.newName(), this.newKind());
+    if (result.ok) this.adding.set(false);
+    else this.addError.set(result.error instanceof ExpensePersistenceError ? 'No se pudo guardar' : nameMessage(result.error.message));
   }
 
   protected async setVisible(kind: Kind, id: string, visible: boolean): Promise<void> {

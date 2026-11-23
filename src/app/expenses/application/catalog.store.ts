@@ -1,8 +1,9 @@
 import { Injectable, computed, inject, resource } from '@angular/core';
+import { ID_GENERATOR } from '@pp/shared/di';
 import { err, ok, type DomainError, type Result } from '@pp/shared/kernel';
-import type { Category, PaymentMethod } from '../domain/category';
+import type { Category, PaymentMethod, PaymentMethodKind } from '../domain/category';
 import { ExpenseNotFoundError, ExpensePersistenceError } from '../domain/expense.errors';
-import type { CategoryId, PaymentMethodId } from '../domain/ids';
+import { paymentMethodId, type CategoryId, type PaymentMethodId } from '../domain/ids';
 import { CATALOG_REPOSITORY } from './ports/catalog.repository';
 import { withCategoryArchived, withMethodArchived } from './use-cases/archive-category';
 import type { CatalogSnapshot } from './use-cases/catalog-check';
@@ -18,6 +19,7 @@ const EMPTY: Catalog = { categories: [], methods: [] };
 @Injectable({ providedIn: 'root' })
 export class CatalogStore {
   private readonly repository = inject(CATALOG_REPOSITORY);
+  private readonly ids = inject(ID_GENERATOR);
 
   private readonly loaded = resource<Catalog, void>({
     loader: async () => {
@@ -68,6 +70,19 @@ export class CatalogStore {
     const existing = this.methodById().get(method.id);
     if (existing) return ok(existing);
     const added = { ...method, position: this.methods().length };
+    return this.commit(
+      { ...this.catalog(), methods: [...this.methods(), added] },
+      () => this.repository.savePaymentMethod(added),
+      added,
+    );
+  }
+
+  /** Adds a user-defined payment method, such as one specific card, at the end of the list. */
+  async addMethod(rawName: string, kind: PaymentMethodKind): Promise<Result<PaymentMethod, DomainError>> {
+    const id = paymentMethodId(`pm-${this.ids.next()}`);
+    const name = validCatalogName('paymentMethod', rawName, id, this.methods());
+    if (!name.ok) return name;
+    const added: PaymentMethod = { id, name: name.value, kind, archived: false, position: this.methods().length };
     return this.commit(
       { ...this.catalog(), methods: [...this.methods(), added] },
       () => this.repository.savePaymentMethod(added),

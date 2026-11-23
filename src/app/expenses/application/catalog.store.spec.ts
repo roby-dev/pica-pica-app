@@ -77,6 +77,28 @@ describe('CatalogStore', () => {
     expect(store.methodById().get(id)?.name).toBe('Cash');
   });
 
+  it('adds a payment method such as a specific card, last in order and persisted', async () => {
+    const { store, repository } = await setup();
+    const before = store.methods().length;
+
+    const result = await store.addMethod('  Visa BCP ', 'credit');
+
+    expect(result.ok).toBe(true);
+    const added = store.activeMethods().at(-1);
+    expect(added).toMatchObject({ name: 'Visa BCP', kind: 'credit', archived: false, position: before });
+    expect(added?.id.startsWith('pm-')).toBe(true);
+    expect((await repository.listPaymentMethods()).some((m) => m.id === added?.id && m.name === 'Visa BCP')).toBe(true);
+  });
+
+  it('refuses a new payment method whose name is taken or empty', async () => {
+    const { store } = await setup();
+    const before = store.methods().length;
+
+    expect((await store.addMethod('crédito', 'credit')).ok).toBe(false);
+    expect((await store.addMethod('   ', 'debit')).ok).toBe(false);
+    expect(store.methods()).toHaveLength(before);
+  });
+
   it('stores the ant-spending choice without touching old categories', async () => {
     const { store, repository } = await setup();
     const [cafe, transporte] = [SEED_CATEGORIES[0], SEED_CATEGORIES[2]];
