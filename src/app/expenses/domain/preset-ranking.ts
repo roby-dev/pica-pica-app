@@ -17,7 +17,8 @@ const MS_PER_DAY = 24 * 60 * 60 * 1000;
 /**
  * Ranks expense names by how likely they are right now: every past occurrence adds a score that
  * fades with age and grows when it happened at a similar hour and on the same kind of day
- * (weekday vs weekend). Each preset autofills from the latest occurrence of its name.
+ * (weekday vs weekend). Names are grouped ignoring case and surrounding spaces; each preset
+ * autofills from, and is labeled as, the latest occurrence of its name.
  */
 export function rankPresets(
   expenses: readonly PresetSource[],
@@ -30,7 +31,8 @@ export function rankPresets(
   const byName = new Map<string, { score: number; latest: PresetSource }>();
 
   for (const expense of expenses) {
-    if (!expense.what) continue;
+    const key = habitKey(expense.what);
+    if (!key) continue;
     const ageDays = Math.max(0, (nowTime - Date.parse(expense.occurredAt)) / MS_PER_DAY);
     const hourGap = circularHourGap(hourOf(expense.occurredAt), nowHour);
     const score =
@@ -38,9 +40,9 @@ export function rankPresets(
       (1 + MAX_HOUR_BOOST * Math.max(0, 1 - hourGap / HOUR_WINDOW)) *
       (isWeekend(expense.occurredAt) === nowWeekend ? SAME_DAY_TYPE_BOOST : 1);
 
-    const entry = byName.get(expense.what);
+    const entry = byName.get(key);
     if (!entry) {
-      byName.set(expense.what, { score, latest: expense });
+      byName.set(key, { score, latest: expense });
       continue;
     }
     entry.score += score;
@@ -51,7 +53,7 @@ export function rankPresets(
     .sort((a, b) => b.score - a.score || Date.parse(b.latest.occurredAt) - Date.parse(a.latest.occurredAt))
     .slice(0, limit)
     .map(({ latest }) => ({
-      what: latest.what,
+      what: latest.what.trim(),
       amountMinor: latest.amount.amountMinor,
       currency: latest.amount.currency,
       categoryId: latest.categoryId,
@@ -59,6 +61,12 @@ export function rankPresets(
       place: latest.place,
     }));
 }
+
+/**
+ * "Café", "café" and " CAFÉ " are one habit, matching how insights counts habits; accents still
+ * matter there, so they do here too.
+ */
+const habitKey = (what: string): string => what.trim().toLowerCase();
 
 /** Local hour with minutes as a fraction, read from the expense's own offset. */
 function hourOf(at: OccurredAt): number {

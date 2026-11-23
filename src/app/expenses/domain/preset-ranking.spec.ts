@@ -53,6 +53,22 @@ describe('rankPresets', () => {
     });
   });
 
+  it('treats names that differ only in case or spaces as one habit, shown as last typed', () => {
+    const presets = rankPresets(
+      [
+        spend('café', '2026-10-24T08:00:00-05:00'),
+        spend(' CAFÉ ', '2026-10-25T08:00:00-05:00'),
+        spend('Café', '2026-10-26T08:00:00-05:00', 950),
+        spend('Cafe', '2026-10-26T09:00:00-05:00'),
+      ],
+      at('2026-10-27T08:00:00-05:00'),
+    );
+
+    // Accents still matter, as in the insights habit counter.
+    expect(presets.map((p) => p.what)).toEqual(['Café', 'Cafe']);
+    expect(presets[0].amountMinor).toBe(950);
+  });
+
   it('prefers the more frequent habit when the context is the same', () => {
     const names = rankPresets(
       [
