@@ -59,6 +59,20 @@ export function projectedTotalMinor(totalMinor: number, range: DateRange, today:
   return Math.round((totalMinor / elapsed) * length);
 }
 
+/** Fewer days than this and one purchase would read as a daily habit. */
+const MIN_DAYS_FOR_YEARLY_PACE = 7;
+const DAYS_PER_YEAR = 365;
+
+/**
+ * What a year costs at the pace of the days already lived in the range: the number that makes a
+ * small habit visible. Null while the range has less than a week behind it.
+ */
+export function yearlyPaceMinor(totalMinor: number, range: DateRange, today: string): number | null {
+  const days = elapsedDays(range, today);
+  if (days < MIN_DAYS_FOR_YEARLY_PACE) return null;
+  return Math.round((totalMinor / days) * DAYS_PER_YEAR);
+}
+
 export interface SeriesPoint {
   readonly key: string;
   readonly totalMinor: number;

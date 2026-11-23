@@ -15,7 +15,9 @@ import {
   topAnt,
   trend,
   unclassifiedCount,
+  yearlyPaceMinor,
   type RankedItem,
+  type TopAntItem,
 } from '../domain/expense-analytics';
 import { canGoNext, previousRange, rangeFor, shiftAnchor, type PeriodKind } from '../domain/period';
 import { INSIGHTS_SOURCE, type LabelInfo } from './ports/insights-source';
@@ -25,6 +27,11 @@ const PLACE_LIMIT = 5;
 /** A ranked group with a human label resolved from the catalog. */
 export interface LabeledItem extends RankedItem {
   readonly color?: string;
+}
+
+/** A repeated small purchase plus what it costs in a year at the current pace (null with too few days). */
+export interface AntHabit extends TopAntItem {
+  readonly yearlyMinor: number | null;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -74,7 +81,14 @@ export class InsightsStore {
   readonly series = computed(() => bucketSeries(this.source.records(), this.period(), this.range(), this.currency()));
 
   readonly ant = computed(() => antSplit(this.current(), this.currency(), this.threshold()));
-  readonly topAnt = computed(() => topAnt(this.current(), this.currency(), this.threshold()));
+  readonly topAnt = computed<readonly AntHabit[]>(() => {
+    const range = this.range();
+    const today = this.today();
+    return topAnt(this.current(), this.currency(), this.threshold()).map((item) => ({
+      ...item,
+      yearlyMinor: yearlyPaceMinor(item.totalMinor, range, today),
+    }));
+  });
   /** Expenses in other currencies in this period; shown as a hint when the threshold cannot judge them. */
   readonly unclassified = computed(() =>
     unclassifiedCount(

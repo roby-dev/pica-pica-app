@@ -156,3 +156,13 @@ describe('InsightsStore currencies', () => {
     expect(store.currency()).toBe(USD);
   });
 });
+
+describe('InsightsStore ant habits', () => {
+  it('adds what each habit costs in a year at the pace of the shown period', () => {
+    const { store } = setup([spend('2026-10-02', 900), spend('2026-10-09', 900), spend('2026-10-16', 900)]);
+
+    expect(store.topAnt()).toEqual([
+      expect.objectContaining({ what: 'Café', count: 3, totalMinor: 2700, yearlyMinor: 32_850 }), // 2700 / 30 days * 365
+    ]);
+  });
+});

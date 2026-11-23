@@ -204,7 +204,14 @@ export class InsightsPage {
   );
 
   protected readonly antRows = computed<readonly TopAntRow[]>(() =>
-    this.store.topAnt().map((a) => ({ key: a.key, what: a.what, place: a.place, count: a.count, total: this.money(a.totalMinor) })),
+    this.store.topAnt().map((a) => ({
+      key: a.key,
+      what: a.what,
+      place: a.place,
+      count: a.count,
+      total: this.money(a.totalMinor),
+      yearly: a.yearlyMinor === null ? null : this.money(a.yearlyMinor),
+    })),
   );
 
   protected money(amountMinor: number): Money {

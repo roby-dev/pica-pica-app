@@ -13,6 +13,7 @@ import {
   topAnt,
   trend,
   unclassifiedCount,
+  yearlyPaceMinor,
   type SpendRecord,
 } from './expense-analytics';
 import { rangeFor } from './period';
@@ -191,5 +192,20 @@ describe('trend', () => {
 
   it('has nothing to compare with when the previous period was empty', () => {
     expect(trend(500, 0)).toBeNull();
+  });
+});
+
+describe('yearlyPaceMinor', () => {
+  it('turns a finished month into what a year at that pace costs', () => {
+    expect(yearlyPaceMinor(16_200, october, '2026-11-10')).toBe(190_742); // 162.00 over 31 days
+  });
+
+  it('uses only the days that already happened in a period in progress', () => {
+    expect(yearlyPaceMinor(15_000, october, '2026-10-15')).toBe(365_000); // 10.00 a day
+  });
+
+  it('gives no pace with less than a week of days, where one purchase would look like a habit', () => {
+    expect(yearlyPaceMinor(900, october, '2026-10-06')).toBeNull();
+    expect(yearlyPaceMinor(900, october, '2026-10-07')).not.toBeNull();
   });
 });

@@ -8,9 +8,11 @@ export interface TopAntRow {
   readonly place: string | null;
   readonly count: number;
   readonly total: Money;
+  /** What the habit costs in a year at the current pace; null when there are too few days to tell. */
+  readonly yearly: Money | null;
 }
 
-/** The habits that cost the most: what you keep buying, where, how often and what it adds up to. */
+/** The habits that cost the most: what you keep buying, where, how often, what it adds up to and per year. */
 @Component({
   selector: 'pp-top-ant-list',
   imports: [AmountText],
@@ -29,7 +31,14 @@ export interface TopAntRow {
               {{ item.count }} {{ item.count === 1 ? 'vez' : 'veces' }}{{ item.place ? ' · ' + item.place : '' }}
             </span>
           </span>
-          <pp-amount-text [money]="item.total" emphasis="md" />
+          <span class="flex shrink-0 flex-col items-end">
+            <pp-amount-text [money]="item.total" emphasis="md" />
+            @if (item.yearly) {
+              <span class="text-sm text-danger-text">
+                <pp-amount-text [money]="item.yearly" emphasis="sm" /> al año
+              </span>
+            }
+          </span>
         </li>
       }
     </ol>
