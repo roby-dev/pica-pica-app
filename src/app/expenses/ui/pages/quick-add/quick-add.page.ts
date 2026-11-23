@@ -24,6 +24,7 @@ const SAVED_MS = 4000;
         #form
         [categories]="catalog.activeCategories()"
         [methods]="catalog.activeMethods()"
+        [presets]="expenses.recentPresets()"
         [whatSuggestions]="expenses.recentWhats()"
         [placeSuggestions]="expenses.recentPlaces()"
         [defaultCurrency]="expenses.defaultCurrency()"

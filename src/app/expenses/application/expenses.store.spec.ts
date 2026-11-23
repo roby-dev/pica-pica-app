@@ -187,6 +187,59 @@ describe('ExpensesStore derived data', () => {
     expect(store.recentPlaces()).toEqual(['Starbucks', 'Bodega Lola']);
   });
 
+  it('builds recent presets from the latest occurrence of each expense name', async () => {
+    const { store } = await setup();
+    await store.add(
+      command({
+        what: 'Café',
+        amountMinor: 700,
+        categoryId: 'cat-cafe',
+        paymentMethodId: 'pm-efectivo',
+        place: 'Bodega',
+        occurredAt: '2026-10-28T09:00:00-05:00',
+      }),
+    );
+    await store.add(
+      command({
+        what: 'Pasaje',
+        amountMinor: 250,
+        categoryId: 'cat-transporte',
+        paymentMethodId: 'pm-efectivo',
+        place: null,
+        occurredAt: '2026-10-29T09:00:00-05:00',
+      }),
+    );
+    await store.add(
+      command({
+        what: 'Café',
+        amountMinor: 950,
+        categoryId: 'cat-cafe',
+        paymentMethodId: 'pm-yape-plin',
+        place: 'Starbucks',
+        occurredAt: '2026-10-30T09:00:00-05:00',
+      }),
+    );
+
+    expect(store.recentPresets()).toEqual([
+      {
+        what: 'Café',
+        amountMinor: 950,
+        currency: 'PEN',
+        categoryId: 'cat-cafe',
+        paymentMethodId: 'pm-yape-plin',
+        place: 'Starbucks',
+      },
+      {
+        what: 'Pasaje',
+        amountMinor: 250,
+        currency: 'PEN',
+        categoryId: 'cat-transporte',
+        paymentMethodId: 'pm-efectivo',
+        place: null,
+      },
+    ]);
+  });
+
   it('totals today and this week per currency, never mixing them', async () => {
     const { store } = await setup();
     await store.add(command({ amountMinor: 900 }));

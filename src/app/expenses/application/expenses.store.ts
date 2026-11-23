@@ -11,6 +11,7 @@ import {
   type Result,
 } from '@pp/shared/kernel';
 import { createExpense, restoreExpense, softDeleteExpense, type Expense } from '../domain/expense';
+import type { ExpensePreset } from '../domain/expense-draft';
 import { ExpenseNotFoundError, ExpensePersistenceError } from '../domain/expense.errors';
 import type { ExpenseId } from '../domain/ids';
 import { isoWeekKey, localDayKey, toOccurredAt } from '../domain/occurred-at';
@@ -57,6 +58,7 @@ export class ExpensesStore {
 
   readonly recentWhats = computed(() => recent(this.all(), (e) => e.what));
   readonly recentPlaces = computed(() => recent(this.all(), (e) => e.place));
+  readonly recentPresets = computed(() => recentPresets(this.all()));
 
   /** Per-currency totals; currencies are never added together. */
   readonly todayTotals = computed(() => {
@@ -210,6 +212,26 @@ function recent(expenses: readonly Expense[], pick: (e: Expense) => string | nul
     if (seen.size === RECENT_LIMIT) break;
   }
   return [...seen];
+}
+
+/** Most recent snapshot for each distinct expense name, used for 1-tap quick-add autofill. */
+function recentPresets(expenses: readonly Expense[]): readonly ExpensePreset[] {
+  const seen = new Set<string>();
+  const presets: ExpensePreset[] = [];
+  for (const expense of expenses) {
+    if (!expense.what || seen.has(expense.what)) continue;
+    seen.add(expense.what);
+    presets.push({
+      what: expense.what,
+      amountMinor: expense.amount.amountMinor,
+      currency: expense.amount.currency,
+      categoryId: expense.categoryId,
+      paymentMethodId: expense.paymentMethodId,
+      place: expense.place,
+    });
+    if (presets.length === RECENT_LIMIT) break;
+  }
+  return presets;
 }
 
 function sumBy(expenses: readonly Expense[], include: (e: Expense) => boolean): CurrencyTotals {

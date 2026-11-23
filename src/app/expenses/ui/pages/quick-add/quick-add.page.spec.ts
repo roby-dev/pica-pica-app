@@ -45,15 +45,82 @@ function chip(root: HTMLElement, scope: string, label: string): HTMLButtonElemen
 describe('QuickAddPage', () => {
   it('shows validation messages and saves nothing when the form is incomplete', async () => {
     const fixture = await setup();
-    el(fixture).querySelector<HTMLButtonElement>('pp-button button[type="submit"]')!.click();
+    const root = el(fixture);
+    // Deselect the preselected default method to verify all three required-field errors.
+    chip(root, 'pp-method-picker', 'Efectivo').click();
+    fixture.detectChanges();
+    root.querySelector<HTMLButtonElement>('pp-button button[type="submit"]')!.click();
     fixture.detectChanges();
 
-    const body = text(el(fixture));
+    const body = text(root);
     expect(body).not.toContain('Cuéntame');
     expect(body).toContain('Ingresa un monto mayor a cero.');
     expect(body).toContain('Elige una categoría.');
     expect(body).toContain('Elige cómo pagaste.');
     expect(TestBed.inject(ExpensesStore).all()).toHaveLength(0);
+  });
+
+  it('preselects the first active payment method when no previous method was remembered', async () => {
+    const fixture = await setup();
+    const root = el(fixture);
+    expect(chip(root, 'pp-method-picker', 'Efectivo').getAttribute('aria-pressed')).toBe('true');
+  });
+
+  it('blurs the amount input when picking a category so the mobile keypad closes', async () => {
+    const fixture = await setup();
+    const root = el(fixture);
+    const amountInput = root.querySelector<HTMLInputElement>('pp-amount-input input')!;
+    amountInput.focus();
+    expect(document.activeElement).toBe(amountInput);
+
+    chip(root, 'pp-category-picker', 'Café').click();
+    fixture.detectChanges();
+    expect(document.activeElement).not.toBe(amountInput);
+  });
+
+  it('fills category, payment method, place and amount when tapping a recent preset chip', async () => {
+    const fixture = await setup();
+    const root = el(fixture);
+    const store = TestBed.inject(ExpensesStore);
+    await store.add({
+      what: 'Latte',
+      amountMinor: 850,
+      categoryId: 'cat-cafe',
+      paymentMethodId: 'pm-yape-plin',
+      place: 'Tostaduría',
+      occurredAt: new Date().toISOString(),
+    });
+    fixture.detectChanges();
+
+    const presetChip = chip(root, '[data-testid="recent-presets"]', 'Latte');
+    presetChip.click();
+    fixture.detectChanges();
+
+    expect(root.querySelector<HTMLInputElement>('pp-amount-input input')!.value).toBe('8.50');
+    expect(root.querySelector<HTMLInputElement>('pp-text-field input')!.value).toBe('Latte');
+    expect(chip(root, 'pp-category-picker', 'Café').getAttribute('aria-pressed')).toBe('true');
+    expect(chip(root, 'pp-method-picker', 'Yape').getAttribute('aria-pressed')).toBe('true');
+
+    root.querySelector<HTMLButtonElement>('pp-button button[type="submit"]')!.click();
+    await vi.waitFor(() => expect(store.all()).toHaveLength(2));
+    expect(store.all()[0]).toMatchObject({
+      what: 'Latte',
+      amount: { amountMinor: 850, currency: 'PEN' },
+      categoryId: 'cat-cafe',
+      paymentMethodId: 'pm-yape-plin',
+      place: 'Tostaduría',
+    });
+  });
+
+  it('adds quick amounts (+1, +2, +5, +10) directly from the amount card pills', async () => {
+    const fixture = await setup();
+    const root = el(fixture);
+
+    chip(root, '[aria-label="Montos rápidos"]', '+5').click();
+    chip(root, '[aria-label="Montos rápidos"]', '+2').click();
+    fixture.detectChanges();
+
+    expect(root.querySelector<HTMLInputElement>('pp-amount-input input')!.value).toBe('7.00');
   });
 
   it('saves an expense in a few taps, updates today totals, resets the form and offers undo inline', async () => {
@@ -168,7 +235,6 @@ describe('QuickAddPage', () => {
     type(root, 'pp-amount-input input', '3');
     fixture.detectChanges();
     chip(root, 'pp-category-picker', 'Snacks').click();
-    chip(root, 'pp-method-picker', 'Efectivo').click();
     fixture.detectChanges();
     root.querySelector<HTMLButtonElement>('pp-button button[type="submit"]')!.click();
     await vi.waitFor(() => {
@@ -228,7 +294,6 @@ describe('QuickAddPage', () => {
     type(root, 'pp-amount-input input', '3');
     fixture.detectChanges();
     chip(root, 'pp-category-picker', 'Snacks').click();
-    chip(root, 'pp-method-picker', 'Efectivo').click();
     fixture.detectChanges();
     root.querySelector<HTMLButtonElement>('pp-button button[type="submit"]')!.click();
 

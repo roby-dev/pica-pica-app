@@ -1,13 +1,15 @@
-import { ChangeDetectionStrategy, Component, computed, effect, input, output, signal, untracked } from '@angular/core';
-import { currency, toIsoWithOffset, type CurrencyCode } from '@pp/shared/kernel';
+import { ChangeDetectionStrategy, Component, computed, effect, input, output, signal, untracked, viewChild } from '@angular/core';
+import { currency, minorExponent, toIsoWithOffset, type CurrencyCode } from '@pp/shared/kernel';
 import { AmountInput, Button, Chip, DateTimeField, Icon, TextField } from '@pp/shared/ui';
 import type { Category, PaymentMethod } from '../../../domain/category';
 import type { CategoryId, PaymentMethodId } from '../../../domain/ids';
 import { MAX_WHAT_LENGTH } from '../../../domain/expense';
-import type { ExpenseDraft } from '../../../domain/expense-draft';
+import type { ExpenseDraft, ExpensePreset } from '../../../domain/expense-draft';
 import { CategoryPicker } from '../category-picker/category-picker';
 import { MethodPicker } from '../method-picker/method-picker';
 import { PlaceField } from '../place-field/place-field';
+
+const QUICK_AMOUNT_STEPS = [1, 2, 5, 10] as const;
 
 /** What the form emits. Structurally the same as the store's command, so pages can hand it straight over. */
 export interface ExpenseFormValue {
@@ -54,9 +56,22 @@ const MESSAGES: Record<FormError, string> = {
         <pp-amount-input
           [currency]="activeCurrency()"
           [autofocus]="autofocus()"
-          [(valueMinor)]="amountMinor"
+          [valueMinor]="amountMinor()"
+          (valueMinorChange)="onAmountInput($event)"
           (submitted)="submit()"
         />
+        <div class="mt-2 flex flex-wrap justify-center gap-2" role="group" aria-label="Montos rápidos">
+          @for (step of quickSteps; track step) {
+            <button
+              type="button"
+              class="min-h-9 rounded-pill border-[0.5px] border-chip-border bg-chip px-3.5 py-1 text-sm font-semibold text-ink transition active:scale-95"
+              [attr.aria-label]="'Sumar ' + step"
+              (click)="addQuickAmount(step)"
+            >
+              +{{ step }}
+            </button>
+          }
+        </div>
         @if (showError('amount')) {
           <span class="text-sm text-danger-text" role="alert">{{ messages.amount }}</span>
         }
@@ -69,8 +84,23 @@ const MESSAGES: Record<FormError, string> = {
         }
       </div>
 
+      @if (presets().length > 0) {
+        <div class="flex flex-col gap-1.5" data-testid="recent-presets">
+          <span class="px-1 text-sm font-medium text-ink-muted">Recientes</span>
+          <div class="scroll-row">
+            @for (preset of presets(); track preset.what) {
+              <pp-chip
+                [label]="preset.what"
+                [selected]="what() === preset.what"
+                (toggled)="applyPreset(preset, $event)"
+              />
+            }
+          </div>
+        </div>
+      }
+
       <div class="flex flex-col gap-1">
-        <pp-category-picker [categories]="categories()" [(selectedId)]="categoryId" />
+        <pp-category-picker [categories]="categories()" [selectedId]="categoryId()" (selectedIdChange)="pickCategory($event)" />
         @if (showError('category')) {
           <span class="px-1 text-sm text-danger-text" role="alert">{{ messages.category }}</span>
         }
@@ -90,7 +120,7 @@ const MESSAGES: Record<FormError, string> = {
           [maxLength]="maxWhat"
           [(value)]="what"
         />
-        @if (whatSuggestions().length > 0) {
+        @if (whatSuggestions().length > 0 && presets().length === 0) {
           <div class="scroll-row">
             @for (item of whatSuggestions(); track item) {
               <pp-chip [label]="item" [selected]="what() === item" (toggled)="what.set($event ? item : '')" />
@@ -149,10 +179,15 @@ const MESSAGES: Record<FormError, string> = {
 export class ExpenseForm {
   protected readonly messages = MESSAGES;
   protected readonly maxWhat = MAX_WHAT_LENGTH;
+  protected readonly quickSteps = QUICK_AMOUNT_STEPS;
+
+  private readonly amountField = viewChild(AmountInput);
+  private presetAmountApplied = false;
 
   readonly categories = input.required<readonly Category[]>();
   readonly methods = input.required<readonly PaymentMethod[]>();
   readonly whatSuggestions = input<readonly string[]>([]);
+  readonly presets = input<readonly ExpensePreset[]>([]);
   readonly placeSuggestions = input<readonly string[]>([]);
   readonly defaultCurrency = input.required<CurrencyCode>();
   readonly allowedCurrencies = input<readonly CurrencyCode[]>([currency('PEN'), currency('USD'), currency('EUR')]);
@@ -233,7 +268,9 @@ export class ExpenseForm {
       const preferred = this.defaultMethodId();
       const methods = this.methods();
       untracked(() => {
-        if (!this.methodId() && preferred && methods.some((m) => m.id === preferred)) this.methodId.set(preferred);
+        if (this.methodId() || methods.length === 0) return;
+        const match = preferred && methods.some((m) => m.id === preferred) ? preferred : methods[0].id;
+        this.methodId.set(match);
       });
     });
     effect(() => this.draftChange.emit(this.snapshot()));
@@ -242,6 +279,7 @@ export class ExpenseForm {
   /** Clears everything for the next entry. The payment method stays: people mostly pay the same way. */
   reset(): void {
     this.amountMinor.set(null);
+    this.presetAmountApplied = false;
     this.what.set('');
     this.categoryId.set(null);
     this.place.set('');
@@ -253,6 +291,49 @@ export class ExpenseForm {
     this.showDetails.set(false);
     this.dateTouched.set(false);
     this.attempted.set(false);
+  }
+
+  protected onAmountInput(value: number | null): void {
+    this.amountMinor.set(value);
+    this.presetAmountApplied = false;
+  }
+
+  protected addQuickAmount(step: number): void {
+    const delta = step * 10 ** minorExponent(this.activeCurrency());
+    this.amountMinor.set((this.amountMinor() ?? 0) + delta);
+    this.presetAmountApplied = false;
+  }
+
+  protected pickCategory(id: CategoryId | null): void {
+    this.categoryId.set(id);
+    if (id) this.amountField()?.blur();
+  }
+
+  protected applyPreset(preset: ExpensePreset, selected: boolean): void {
+    if (!selected) {
+      this.what.set('');
+      if (this.presetAmountApplied) {
+        this.amountMinor.set(null);
+        this.presetAmountApplied = false;
+      }
+      return;
+    }
+    this.what.set(preset.what);
+    if (this.categories().some((c) => c.id === preset.categoryId)) {
+      this.categoryId.set(preset.categoryId);
+    }
+    if (this.methods().some((m) => m.id === preset.paymentMethodId)) {
+      this.methodId.set(preset.paymentMethodId);
+    }
+    if (preset.place && !this.place()) {
+      this.place.set(preset.place);
+    }
+    if (!this.amountMinor() || this.presetAmountApplied) {
+      this.amountMinor.set(preset.amountMinor);
+      this.selectedCurrency.set(preset.currency === this.defaultCurrency() ? null : preset.currency);
+      this.presetAmountApplied = true;
+    }
+    this.amountField()?.blur();
   }
 
   protected pickDate(iso: string): void {

@@ -88,4 +88,9 @@ export class AmountInput {
     this.text = (event.target as HTMLInputElement).value;
     this.valueMinor.set(parseAmountToMinor(this.text, this.exponent()));
   }
+
+  /** Releases focus so the mobile keypad closes once the user moves on to tiles or chips. */
+  blur(): void {
+    this.field().nativeElement.blur();
+  }
 }
