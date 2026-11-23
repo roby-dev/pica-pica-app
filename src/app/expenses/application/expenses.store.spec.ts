@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { provideSettings, SettingsStore } from '@pp/settings';
 import { CLOCK, ID_GENERATOR, LiveClock } from '@pp/shared/di';
-import { Money, currency } from '@pp/shared/kernel';
+import { Money, currency, toIsoWithOffset } from '@pp/shared/kernel';
 import { FakeClock, SequentialIdGenerator } from '@pp/shared/testing';
 import { ExpensePersistenceError } from '../domain/expense.errors';
 import { InMemoryCatalogRepository } from '../infrastructure/memory/in-memory-catalog.repository';
@@ -256,14 +256,19 @@ describe('ExpensesStore derived data', () => {
   });
 
   it('moves today, this week and the preset order forward when the live clock refreshes', async () => {
+    // Built in the machine's own time zone, like the app on a phone: CI runs in UTC, the phone in Lima.
+    const local = (month: number, day: number, hour: number) => new Date(2026, month - 1, day, hour);
     const { store, clock } = await setup();
-    await store.add(command({ what: 'Café', amountMinor: 900, occurredAt: '2026-10-30T08:00:00-05:00' }));
-    await store.add(command({ what: 'Cerveza', amountMinor: 1200, occurredAt: '2026-10-29T21:00:00-05:00' }));
+    const live = TestBed.inject(LiveClock);
+    clock.set(local(10, 30, 13)); // Friday afternoon
+    live.refresh();
+    await store.add(command({ what: 'Café', amountMinor: 900, occurredAt: toIsoWithOffset(local(10, 30, 8)) }));
+    await store.add(command({ what: 'Cerveza', amountMinor: 1200, occurredAt: toIsoWithOffset(local(10, 29, 21)) }));
     const pen = currency('PEN');
     expect(store.todayTotals().get(pen)).toBe(900);
 
-    clock.set(new Date('2026-11-02T21:00:00-05:00')); // next Monday night, app resumed from background
-    TestBed.inject(LiveClock).refresh();
+    clock.set(local(11, 2, 21)); // next Monday night, app resumed from background
+    live.refresh();
 
     expect(store.todayTotals().get(pen) ?? 0).toBe(0);
     expect(store.weekTotals().get(pen) ?? 0).toBe(0);
