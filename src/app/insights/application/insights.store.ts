@@ -1,5 +1,5 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
-import { CLOCK } from '@pp/shared/di';
+import { CLOCK, LiveClock } from '@pp/shared/di';
 import { toIsoWithOffset, type CurrencyCode } from '@pp/shared/kernel';
 import {
   antSplit,
@@ -31,6 +31,7 @@ export interface LabeledItem extends RankedItem {
 export class InsightsStore {
   private readonly source = inject(INSIGHTS_SOURCE);
   private readonly clock = inject(CLOCK);
+  private readonly liveClock = inject(LiveClock);
 
   readonly period = signal<PeriodKind>('month');
   private readonly anchor = signal(toDay(this.clock.now()));
@@ -39,7 +40,8 @@ export class InsightsStore {
   readonly loading = this.source.loading;
   readonly threshold = this.source.threshold;
 
-  readonly today = computed(() => toDay(this.clock.now()));
+  /** Follows the live clock, so resuming the app on a new day moves "today" without moving the chosen period. */
+  readonly today = computed(() => toDay(this.liveClock.now()));
   readonly range = computed(() => rangeFor(this.period(), this.anchor()));
   readonly previous = computed(() => previousRange(this.period(), this.anchor()));
   readonly canGoNext = computed(() => canGoNext(this.period(), this.anchor(), this.today()));

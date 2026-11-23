@@ -1,6 +1,6 @@
 import { Injectable, computed, inject, resource, signal } from '@angular/core';
 import { SettingsStore } from '@pp/settings';
-import { CLOCK, ID_GENERATOR } from '@pp/shared/di';
+import { CLOCK, ID_GENERATOR, LiveClock } from '@pp/shared/di';
 import {
   addTo,
   emptyTotals,
@@ -11,10 +11,10 @@ import {
   type Result,
 } from '@pp/shared/kernel';
 import { createExpense, restoreExpense, softDeleteExpense, type Expense } from '../domain/expense';
-import type { ExpensePreset } from '../domain/expense-draft';
 import { ExpenseNotFoundError, ExpensePersistenceError } from '../domain/expense.errors';
 import type { ExpenseId } from '../domain/ids';
 import { isoWeekKey, localDayKey, toOccurredAt } from '../domain/occurred-at';
+import { rankPresets } from '../domain/preset-ranking';
 import { CatalogStore } from './catalog.store';
 import { EXPENSE_REPOSITORY } from './ports/expense.repository';
 import { addExpense, type ExpenseCommand } from './use-cases/add-expense';
@@ -35,6 +35,7 @@ export class ExpensesStore {
   private readonly settings = inject(SettingsStore);
   private readonly clock = inject(CLOCK);
   private readonly ids = inject(ID_GENERATOR);
+  private readonly liveClock = inject(LiveClock);
 
   private readonly loaded = resource<readonly Expense[], void>({
     loader: () => this.repository.list(),
@@ -58,16 +59,17 @@ export class ExpensesStore {
 
   readonly recentWhats = computed(() => recent(this.all(), (e) => e.what));
   readonly recentPlaces = computed(() => recent(this.all(), (e) => e.place));
-  readonly recentPresets = computed(() => recentPresets(this.all()));
+  /** Ranked by habit for the current hour and day type; re-ranked when the list changes or the app resumes. */
+  readonly recentPresets = computed(() => rankPresets(this.all(), toOccurredAt(this.liveClock.now()), RECENT_LIMIT));
 
   /** Per-currency totals; currencies are never added together. */
   readonly todayTotals = computed(() => {
-    const today = localDayKey(toOccurredAt(this.clock.now()));
+    const today = localDayKey(toOccurredAt(this.liveClock.now()));
     return sumBy(this.all(), (e) => localDayKey(e.occurredAt) === today);
   });
 
   readonly weekTotals = computed(() => {
-    const week = isoWeekKey(toOccurredAt(this.clock.now()));
+    const week = isoWeekKey(toOccurredAt(this.liveClock.now()));
     return sumBy(this.all(), (e) => isoWeekKey(e.occurredAt) === week);
   });
 
@@ -212,26 +214,6 @@ function recent(expenses: readonly Expense[], pick: (e: Expense) => string | nul
     if (seen.size === RECENT_LIMIT) break;
   }
   return [...seen];
-}
-
-/** Most recent snapshot for each distinct expense name, used for 1-tap quick-add autofill. */
-function recentPresets(expenses: readonly Expense[]): readonly ExpensePreset[] {
-  const seen = new Set<string>();
-  const presets: ExpensePreset[] = [];
-  for (const expense of expenses) {
-    if (!expense.what || seen.has(expense.what)) continue;
-    seen.add(expense.what);
-    presets.push({
-      what: expense.what,
-      amountMinor: expense.amount.amountMinor,
-      currency: expense.amount.currency,
-      categoryId: expense.categoryId,
-      paymentMethodId: expense.paymentMethodId,
-      place: expense.place,
-    });
-    if (presets.length === RECENT_LIMIT) break;
-  }
-  return presets;
 }
 
 function sumBy(expenses: readonly Expense[], include: (e: Expense) => boolean): CurrencyTotals {

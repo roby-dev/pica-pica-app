@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { provideSettings, SettingsStore } from '@pp/settings';
-import { CLOCK, ID_GENERATOR } from '@pp/shared/di';
+import { CLOCK, ID_GENERATOR, LiveClock } from '@pp/shared/di';
 import { Money, currency } from '@pp/shared/kernel';
 import { FakeClock, SequentialIdGenerator } from '@pp/shared/testing';
 import { ExpensePersistenceError } from '../domain/expense.errors';
@@ -28,12 +28,13 @@ const command = (overrides: Partial<ExpenseCommand> = {}): ExpenseCommand => ({
 async function setup(repository: ExpenseRepository = new InMemoryExpenseRepository()) {
   const catalogRepository = new InMemoryCatalogRepository();
   await seedCatalog(catalogRepository, NOW);
+  const clock = new FakeClock(NOW);
   TestBed.configureTestingModule({
     providers: [
       provideSettings({ persistence: 'memory' }),
       { provide: EXPENSE_REPOSITORY, useValue: repository },
       { provide: CATALOG_REPOSITORY, useValue: catalogRepository },
-      { provide: CLOCK, useValue: new FakeClock(NOW) },
+      { provide: CLOCK, useValue: clock },
       { provide: ID_GENERATOR, useValue: new SequentialIdGenerator() },
     ],
   });
@@ -42,7 +43,7 @@ async function setup(repository: ExpenseRepository = new InMemoryExpenseReposito
   const settings = TestBed.inject(SettingsStore);
   await vi.waitFor(() => expect(catalog.ready() && settings.ready()).toBe(true));
   await vi.waitFor(() => expect(store.isLoading()).toBe(false));
-  return { store, catalog, settings, repository };
+  return { store, catalog, settings, repository, clock };
 }
 
 /** A repository whose writes can be held back or made to fail. */
@@ -252,6 +253,21 @@ describe('ExpensesStore derived data', () => {
     expect(store.todayTotals().get(pen)).toBe(1050);
     expect(store.todayTotals().get(currency('USD'))).toBe(500);
     expect(store.weekTotals().get(pen)).toBe(1750);
+  });
+
+  it('moves today, this week and the preset order forward when the live clock refreshes', async () => {
+    const { store, clock } = await setup();
+    await store.add(command({ what: 'Café', amountMinor: 900, occurredAt: '2026-10-30T08:00:00-05:00' }));
+    await store.add(command({ what: 'Cerveza', amountMinor: 1200, occurredAt: '2026-10-29T21:00:00-05:00' }));
+    const pen = currency('PEN');
+    expect(store.todayTotals().get(pen)).toBe(900);
+
+    clock.set(new Date('2026-11-02T21:00:00-05:00')); // next Monday night, app resumed from background
+    TestBed.inject(LiveClock).refresh();
+
+    expect(store.todayTotals().get(pen) ?? 0).toBe(0);
+    expect(store.weekTotals().get(pen) ?? 0).toBe(0);
+    expect(store.recentPresets()[0].what).toBe('Cerveza');
   });
 });
 
