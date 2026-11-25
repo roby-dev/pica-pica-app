@@ -11,8 +11,8 @@ S4. Accepted scope: “**Todos tus gastos registrados cuentan**, sin aplicar el 
 
 ## Tasks
 
-- T1 · S2, S4 · Local settings, persistence compatibility and Settings controls · route: bounded worker (context backstop); Risk: item 3 (existing v1 restore/export and startup settings use the changed contract) · status: verified · commit: this work unit
-- T2 · S1, S3, S4 · Weekly budget status in Summary and focused user-facing checks · route: depends on T1 · status: pending · commit: —
+- T1 · S2, S4 · Local settings, persistence compatibility and Settings controls · route: bounded worker (context backstop); Risk: item 3 (existing v1 restore/export and startup settings use the changed contract) · status: done · commit: e81431b
+- T2 · S1, S3, S4 · Weekly budget status in Summary and focused user-facing checks · route: bounded worker (context backstop; T1 complete); Risk: none (additive display and calculations, shared contracts unchanged) · status: done · commit: a0de283
 
 ## Log
 
@@ -24,3 +24,7 @@ L5. Exploration found the existing Monday–Sunday helper and separate currency 
 L6. T1 writer observed 19 RED failures before implementation and one separate startup RED. T1 focused suite passed 53/53, lint passed; parent repeated 53/53 and verified architecture boundaries and whitespace. No commit.
 L7. Assessment applied Task Size item 3 and required independent verification. Independent readback found no reproduced product blocker, but runtime verification did not start: the isolated pnpm launcher setup raised `SyntaxError: Invalid or unexpected token`. Do not count it as passed or retry the unavailable verifier. Export before settings finish loading remains an unverified pre-existing timing risk. T2 has not started.
 L8. User supplied a separate isolated verification of the same T1 diff: focused suite 53/53 in seven files, dedicated IndexedDB + backup cold-reload probe 1/1, lint, boundary verification and production build all exit 0. The probe confirmed old v1 preservation, explicit empty-list clearing, and separate PEN/USD storage and restore. No blockers; the early-export timing risk predates the change.
+L9. Delivery slice 1 is `a91c51b..e81431b` (427 authored changed lines including this document; 401 in implementation and tests). T2 starts a separate slice. Delivery strategy remains ask-on-risk if publication is requested.
+L10. T2 RED: three user-facing tests failed for the absent budget section. GREEN: 77/77 Insights tests and lint passed. The full suite found a Settings subtitle regression; preserving the former text fixed it. Final suite: 389/389 in 41 files; lint, boundaries, whitespace check and production build passed. Native assessment for T2: medium, RDD off, reviewDue false, no additional verifier.
+L11. Chromium / Pixel 7 Playwright smoke passed on the production build: set PEN 150 and USD 40, saved PEN 160 and USD 12 through Quick Add, checked overage PEN 10 and remaining USD 28 in Análisis and after reload. Physical iPhone not tested.
+L12. Delivery slice 2 starts after `e81431b` and includes `a0de283` (197 authored changed lines) and this closeout record. No push or pull request.
