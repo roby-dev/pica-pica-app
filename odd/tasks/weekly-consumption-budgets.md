@@ -1,6 +1,6 @@
 # Weekly consumption budgets
 Track weekly consumption after savings, without combining currencies.
-Delivery strategy: ask-on-risk. Work-unit forecast: about two reviewable slices; confirm authored size after implementation.
+Delivery strategy: single-pr (user-selected). Keep both verified work units in one PR if requested.
 
 ## Specs
 
@@ -27,4 +27,5 @@ L8. User supplied a separate isolated verification of the same T1 diff: focused 
 L9. Delivery slice 1 is `a91c51b..e81431b` (427 authored changed lines including this document; 401 in implementation and tests). T2 starts a separate slice. Delivery strategy remains ask-on-risk if publication is requested.
 L10. T2 RED: three user-facing tests failed for the absent budget section. GREEN: 77/77 Insights tests and lint passed. The full suite found a Settings subtitle regression; preserving the former text fixed it. Final suite: 389/389 in 41 files; lint, boundaries, whitespace check and production build passed. Native assessment for T2: medium, RDD off, reviewDue false, no additional verifier.
 L11. Chromium / Pixel 7 Playwright smoke passed on the production build: set PEN 150 and USD 40, saved PEN 160 and USD 12 through Quick Add, checked overage PEN 10 and remaining USD 28 in Análisis and after reload. Physical iPhone not tested.
-L12. Delivery slice 2 starts after `e81431b` and includes `a0de283` (197 authored changed lines) and this closeout record. No push or pull request.
+L12. Delivery slice 2 starts after `e81431b` and includes `a0de283` (197 authored changed lines) and this closeout record. No push or pull request at implementation close.
+L13. User requested commit and push, and selected “Un solo PR (menos recomendado)”. Whole-PR scope, if requested: all commits on `feat/weekly-consumption-budgets` since `a91c51b`. This request publishes the branch only; no PR is authorized.
