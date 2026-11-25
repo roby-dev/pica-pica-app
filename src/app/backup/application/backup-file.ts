@@ -1,5 +1,6 @@
 import type { Category, Expense, PaymentMethod } from '@pp/expenses';
-import { DomainError, err, ok, parseCurrency, type Result } from '@pp/shared/kernel';
+import { parseWeeklyBudgets } from '@pp/settings';
+import { DomainError, err, ok, parseCurrency, type Money, type Result } from '@pp/shared/kernel';
 
 export const BACKUP_FORMAT = 'pica-pica-backup';
 export const BACKUP_VERSION = 1;
@@ -8,6 +9,8 @@ export interface BackupSettings {
   readonly theme: 'system' | 'light' | 'dark';
   readonly defaultCurrency: string;
   readonly antThresholdMinor: number;
+  /** Older v1 backups omit this; an explicit empty list clears existing caps. */
+  readonly weeklyBudgets?: readonly Money[];
 }
 
 /** Everything the user created, as plain JSON. Deleted expenses are not part of a backup. */
@@ -54,7 +57,7 @@ const validExpense = (e: unknown): boolean => {
   );
 };
 
-const validSettings = (s: unknown): boolean =>
+const validSettings = (s: unknown): s is Json =>
   isRecord(s) && ['system', 'light', 'dark'].includes(s['theme'] as string) && isString(s['defaultCurrency']) &&
   parseCurrency(s['defaultCurrency']).ok && isNumber(s['antThresholdMinor']) && s['antThresholdMinor'] > 0;
 
@@ -78,5 +81,12 @@ export function parseBackup(text: string): Result<BackupFile, BackupFormatError>
     Array.isArray(categories) && categories.every(validCategory) &&
     Array.isArray(methods) && methods.every(validMethod) &&
     Array.isArray(expenses) && expenses.every(validExpense);
-  return ok_ ? ok(data as unknown as BackupFile) : err(new BackupFormatError());
+  if (!ok_) return err(new BackupFormatError());
+
+  const file = data as unknown as BackupFile;
+  if (settings['weeklyBudgets'] === undefined) return ok(file);
+  const budgets = parseWeeklyBudgets(settings['weeklyBudgets']);
+  return budgets.ok
+    ? ok({ ...file, settings: { ...file.settings, weeklyBudgets: budgets.value } })
+    : err(new BackupFormatError());
 }

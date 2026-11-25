@@ -2,6 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { CATALOG_REPOSITORY, CatalogStore, EXPENSE_REPOSITORY, ExpensesStore, SEED_CATEGORIES } from '@pp/expenses';
 import { provideSettings, SettingsStore } from '@pp/settings';
 import { CLOCK, ID_GENERATOR } from '@pp/shared/di';
+import { Money, currency } from '@pp/shared/kernel';
 import { FakeClock, SequentialIdGenerator } from '@pp/shared/testing';
 import { InMemoryCatalogRepository } from '../../expenses/infrastructure/memory/in-memory-catalog.repository';
 import { InMemoryExpenseRepository } from '../../expenses/infrastructure/memory/in-memory-expense.repository';
@@ -54,6 +55,30 @@ describe('BackupService', () => {
     const second = await b.backup.restore(text);
     expect(second.ok && second.value).toMatchObject({ imported: 0, duplicates: 1, categories: 0, methods: 0 });
     expect(b.expenses.all().length).toBe(1);
+  });
+
+  it('round-trips explicit caps in v1; omission preserves them and an empty list clears them', async () => {
+    await device();
+    const source = await ready();
+    const legacy = source.backup.createBackup();
+    expect(legacy.settings).not.toHaveProperty('weeklyBudgets');
+    const weeklyBudgets = [Money.of(150, currency('PEN')), Money.of(40, currency('USD'))];
+    const patch = { weeklyBudgets, theme: 'light' as const };
+    await source.settings.update(patch);
+    await source.backup.markExported();
+    const file = source.backup.createBackup();
+    expect(file).toMatchObject({ version: 1, settings: { weeklyBudgets } });
+
+    await device();
+    const target = await ready();
+    expect((await target.backup.restore(JSON.stringify(file))).ok).toBe(true);
+    expect(target.settings.settings()).toMatchObject({ weeklyBudgets, theme: 'light' });
+    expect((await target.backup.restore(JSON.stringify(legacy))).ok).toBe(true);
+    expect(target.settings.settings()).toMatchObject({ weeklyBudgets, theme: 'dark' });
+
+    const cleared = { ...file, settings: { ...file.settings, weeklyBudgets: [] } };
+    expect((await target.backup.restore(JSON.stringify(cleared))).ok).toBe(true);
+    expect(target.backup.createBackup().settings).toMatchObject({ weeklyBudgets: [] });
   });
 
   it('refuses a file that is not a backup and changes nothing', async () => {

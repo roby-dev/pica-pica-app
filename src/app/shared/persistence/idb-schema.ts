@@ -42,6 +42,7 @@ export interface SettingsRecord {
   key: 'app';
   defaultCurrency: string;
   antExpenseThreshold: { amountMinor: number; currency: string };
+  weeklyBudgets?: readonly { amountMinor: number; currency: string }[];
   theme: 'system' | 'light' | 'dark';
   weekStartsOn: 1;
   lastBackupAt: string | null;

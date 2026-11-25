@@ -7,6 +7,8 @@ export interface AppSettings {
   readonly defaultCurrency: CurrencyCode;
   /** Expenses at or below this amount (same currency) count as ant expenses. */
   readonly antExpenseThreshold: Money;
+  /** Weekly spending caps in minor units; at most one per currency. */
+  readonly weeklyBudgets?: readonly Money[];
   readonly theme: ThemePreference;
   /** Monday. Fixed in the MVP, kept as data so it can become a preference later. */
   readonly weekStartsOn: 1;

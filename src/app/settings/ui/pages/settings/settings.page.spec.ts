@@ -14,7 +14,62 @@ async function setup() {
   return { fixture, store, el: fixture.nativeElement as HTMLElement };
 }
 
+const button = (el: Element, label: string) =>
+  Array.from(el.querySelectorAll('button')).find((b) => b.textContent?.trim() === label)!;
+
+function enter(input: HTMLInputElement, value: string) {
+  input.value = value;
+  input.dispatchEvent(new Event('input'));
+}
+
 describe('SettingsPage', () => {
+  it('sets, edits and removes weekly caps independently by currency', async () => {
+    const { fixture, store, el } = await setup();
+    const section = el.querySelector('[aria-label="Presupuesto semanal"]');
+    expect(section).not.toBeNull();
+    const select = section!.querySelector('select')!;
+    const input = section!.querySelector('input')!;
+    const selectCurrency = (code: string) => {
+      select.value = code;
+      select.dispatchEvent(new Event('change'));
+      fixture.detectChanges();
+    };
+    const save = async (inputText: string, expected: string) => {
+      enter(input, inputText);
+      fixture.detectChanges();
+      button(section!, 'Guardar tope').click();
+      await vi.waitFor(() => {
+        fixture.detectChanges();
+        expect(section!.querySelector('ul')?.textContent).toContain(expected);
+      });
+    };
+
+    expect(select.value).toBe('PEN');
+    for (const invalid of ['0', '-10', '1.234']) {
+      enter(input, invalid);
+      fixture.detectChanges();
+      expect(button(section!, 'Guardar tope').disabled).toBe(true);
+    }
+    await save('150', '150.00');
+    selectCurrency('USD');
+    expect(input.value).toBe('');
+    await save('40', '40.00');
+    selectCurrency('PEN');
+    expect(input.value).toBe('150.00');
+    await save('175,25', '175.25');
+    button(section!, 'Quitar tope').click();
+    await vi.waitFor(() => {
+      fixture.detectChanges();
+      expect(section!.querySelector('ul')?.textContent).not.toContain('PEN');
+    });
+    selectCurrency('JPY');
+    await save('500', '500');
+    expect(store.settings()).toMatchObject({
+      weeklyBudgets: [{ currency: 'USD', amountMinor: 4000 }, { currency: 'JPY', amountMinor: 500 }],
+      defaultCurrency: 'PEN', antExpenseThreshold: { currency: 'PEN', amountMinor: 2000 },
+    });
+  });
+
   it('shows the saved threshold and saves a new one', async () => {
     const { fixture, store, el } = await setup();
     const input = el.querySelector('pp-amount-input input') as HTMLInputElement;

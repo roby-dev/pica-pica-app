@@ -22,6 +22,18 @@ describe('backup file', () => {
   });
 
   it.each([
+    null, {}, [null], [{ currency: 'ZZZ9', amountMinor: 1 }],
+    [{ currency: 'PEN', amountMinor: 0 }], [{ currency: 'PEN', amountMinor: -1 }],
+    [{ currency: 'PEN', amountMinor: 1.5 }],
+    [{ currency: 'PEN', amountMinor: Number.MAX_SAFE_INTEGER + 1 }],
+    [{ currency: 'USD', amountMinor: 1 }, { currency: ' usd ', amountMinor: 2 }],
+  ].map((value) => [value]))('rejects malformed weekly caps: %j', (weeklyBudgets) => {
+    const file = buildBackup(valid as never);
+    const parsed = parseBackup(JSON.stringify({ ...file, settings: { ...file.settings, weeklyBudgets } }));
+    expect(!parsed.ok && parsed.error).toBeInstanceOf(BackupFormatError);
+  });
+
+  it.each([
     ['not json', 'nope'],
     ['another format', JSON.stringify({ format: 'x' })],
     ['a smart spend list', JSON.stringify([{ titulo: 'x', detalles: [] }])],

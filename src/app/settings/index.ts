@@ -7,6 +7,8 @@ export {
 } from './domain/app-settings';
 export {
   InvalidThresholdError,
+  InvalidWeeklyBudgetsError,
+  parseWeeklyBudgets,
   ThresholdCurrencyRequiredError,
   type SettingsPatch,
 } from './domain/settings.rules';

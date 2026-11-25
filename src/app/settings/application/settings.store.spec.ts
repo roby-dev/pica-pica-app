@@ -1,9 +1,9 @@
 import { TestBed } from '@angular/core/testing';
 import { Money, currency } from '@pp/shared/kernel';
-import { defaultSettings } from '../domain/app-settings';
+import { defaultSettings, SETTINGS_REPOSITORY, SettingsStore } from '@pp/settings';
 import { InMemorySettingsRepository } from '../infrastructure/in-memory-settings.repository';
-import { SETTINGS_REPOSITORY } from './ports/settings.repository';
-import { SettingsStore } from './settings.store';
+
+const budgets = [Money.of(150, currency('PEN')), Money.of(40, currency('USD'))];
 
 const setup = (repository = new InMemorySettingsRepository()) => {
   TestBed.configureTestingModule({
@@ -46,12 +46,56 @@ describe('SettingsStore', () => {
     expect(await repository.load()).toBeNull();
   });
 
-  it('accepts a currency change with its threshold', async () => {
-    const { store } = setup();
+  it('keeps distinct budgets through a threshold and default currency change', async () => {
+    const { store, repository } = setup();
     await vi.waitFor(() => expect(store.ready()).toBe(true));
+    expect(store.weeklyBudgets()).toEqual([]);
+    const patch = { weeklyBudgets: budgets, theme: 'light' as const };
+    expect((await store.update(patch)).ok).toBe(true);
+    expect(store.weeklyBudgets()).toEqual(budgets);
     const usd = currency('USD');
     const result = await store.update({ defaultCurrency: usd, antExpenseThreshold: Money.of(5, usd) });
     expect(result.ok).toBe(true);
     expect(store.antExpenseThreshold()).toEqual(Money.of(5, usd));
+    expect(store.weeklyBudgets()).toEqual(budgets);
+    expect(await repository.load()).toMatchObject({ weeklyBudgets: budgets });
+  });
+
+  it('preserves persisted caps if a legacy patch arrives before settings have loaded', async () => {
+    const repository = new InMemorySettingsRepository();
+    await repository.save({ ...defaultSettings(), weeklyBudgets: budgets });
+    const load = repository.load.bind(repository);
+    let finishLoad!: () => void;
+    const waiting = new Promise<void>((resolve) => { finishLoad = resolve; });
+    vi.spyOn(repository, 'load').mockImplementation(async () => {
+      await waiting;
+      return load();
+    });
+    const { store } = setup(repository);
+    expect(store.ready()).toBe(false);
+    const update = store.update({ theme: 'light' });
+    finishLoad();
+    expect((await update).ok).toBe(true);
+    expect(store.weeklyBudgets()).toEqual(budgets);
+    expect(await repository.load()).toMatchObject({ weeklyBudgets: budgets, theme: 'light' });
+  });
+
+  it.each([
+    [0, 'PEN'], [-1, 'PEN'], [1.5, 'PEN'], [Number.MAX_SAFE_INTEGER + 1, 'PEN'],
+    [1, 'ZZZ9'], [1, 'usd'],
+  ])('rejects an invalid cap (%s %s) without saving any part of the patch', async (amountMinor, code) => {
+    const { store, repository } = setup();
+    await vi.waitFor(() => expect(store.ready()).toBe(true));
+    const validPatch = { weeklyBudgets: budgets, theme: 'light' as const };
+    await store.update(validPatch);
+    const before = await repository.load();
+    const badPatch = {
+      weeklyBudgets: [budgets[1], { amountMinor, currency: code as ReturnType<typeof currency> }],
+      theme: 'dark' as const,
+    };
+    const result = await store.update(badPatch);
+    expect(!result.ok && result.error.code).toBe('INVALID_WEEKLY_BUDGETS');
+    expect(store.theme()).toBe('light');
+    expect(await repository.load()).toBe(before);
   });
 });

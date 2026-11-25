@@ -19,10 +19,13 @@ export class BackupService {
   private readonly clock = inject(CLOCK);
 
   createBackup(): BackupFile {
-    const { theme, defaultCurrency, antExpenseThreshold } = this.settings.settings();
+    const { theme, defaultCurrency, antExpenseThreshold, weeklyBudgets } = this.settings.settings();
     return buildBackup({
       exportedAt: toIsoWithOffset(this.clock.now()),
-      settings: { theme, defaultCurrency, antThresholdMinor: antExpenseThreshold.amountMinor },
+      settings: {
+        theme, defaultCurrency, antThresholdMinor: antExpenseThreshold.amountMinor,
+        ...(weeklyBudgets === undefined ? {} : { weeklyBudgets }),
+      },
       categories: this.catalog.categories(),
       methods: this.catalog.methods(),
       expenses: this.expenses.all(),
@@ -69,11 +72,13 @@ export class BackupService {
     );
 
     const currency = parseCurrency(file.settings.defaultCurrency);
+    const { weeklyBudgets } = file.settings;
     if (currency.ok) {
       await this.settings.update({
         theme: file.settings.theme,
         defaultCurrency: currency.value,
         antExpenseThreshold: { amountMinor: file.settings.antThresholdMinor, currency: currency.value },
+        ...(weeklyBudgets === undefined ? {} : { weeklyBudgets }),
       });
     }
     return ok({ ...summary, categories, methods });

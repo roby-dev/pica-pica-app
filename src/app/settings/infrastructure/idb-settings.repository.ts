@@ -4,6 +4,7 @@ import { Money, parseCurrency } from '@pp/shared/kernel';
 import type { SettingsRecord } from '@pp/shared/persistence';
 import type { SettingsRepository } from '../application/ports/settings.repository';
 import type { AppSettings } from '../domain/app-settings';
+import { parseWeeklyBudgets } from '../domain/settings.rules';
 
 const KEY = 'app';
 
@@ -34,6 +35,7 @@ export function toRecord(settings: AppSettings): SettingsRecord {
     theme: settings.theme,
     weekStartsOn: settings.weekStartsOn,
     lastBackupAt: settings.lastBackupAt,
+    ...(settings.weeklyBudgets === undefined ? {} : { weeklyBudgets: settings.weeklyBudgets }),
   };
 }
 
@@ -44,6 +46,8 @@ export function toDomain(record: SettingsRecord): AppSettings | null {
   if (!defaultCurrency.ok || !thresholdCurrency.ok) return null;
   if (!Number.isSafeInteger(record.antExpenseThreshold.amountMinor)) return null;
 
+  // An invalid optional field should not discard otherwise readable legacy settings.
+  const budgets = record.weeklyBudgets === undefined ? undefined : parseWeeklyBudgets(record.weeklyBudgets);
   return {
     defaultCurrency: defaultCurrency.value,
     antExpenseThreshold: Money.fromMinor(
@@ -53,5 +57,6 @@ export function toDomain(record: SettingsRecord): AppSettings | null {
     theme: record.theme,
     weekStartsOn: 1,
     lastBackupAt: record.lastBackupAt,
+    ...(budgets?.ok ? { weeklyBudgets: budgets.value } : {}),
   };
 }
