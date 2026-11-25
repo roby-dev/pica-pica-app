@@ -337,7 +337,8 @@ export class ExpensesStore {
   - `unclassifiedCount` (expenses in currencies ≠ threshold currency) shown as a hint.
   - Quick-add's today/week totals are NOT taken from insights (that would create an expenses→insights cycle);
     `ExpensesStore` exposes `todayTotals`/`weekTotals` built with `shared/kernel` `CurrencyTotals`.
-  - All math lives in pure `insights/domain/expense-analytics.ts`, each function taking `(expenses, currency, ...)`.
+  - `weeklyBudgetRange` follows `LiveClock` for the current local Monday–Sunday week, independent of the analytics period and currency selection. `weeklyBudgets` reads configured caps via the public `SettingsStore` signal and counts all active expense records from the existing insights source, per currency and without the ant threshold.
+  - Analytics math lives in `insights/domain/expense-analytics.ts`; `weekly-budget.ts` reuses its date/currency filtering and summing helpers.
 - Page-local UI state (history `query`, `categoryFilter`) = `signal`s in the page; `computed` `filtered`/`groupedByDay`.
 - Forms: Signal Forms (`form(model, schema)`) inside `expense-form` and `threshold-field`; domain factory is the final validator on submit.
 
@@ -350,8 +351,8 @@ export class ExpensesStore {
 | `/add` | expenses · QuickAddPage | Today/week totals (stat-cards, default currency), big `amount-input`, `what` with recent chips, category & method chips, place with recent chips, collapsible date/time, note, "Cambiar moneda". Save → undo toast. Goal: ≤ 3 taps + amount. |
 | `/history` | expenses · HistoryPage | search, category filter, list grouped by day (day totals per currency), tap → edit, swipe/long-press → delete. |
 | `/history/:id` | expenses · ExpenseEditPage | prefilled `expense-form`, delete. |
-| `/insights` | insights · InsightsPage | period segmented + prev/next, currency switcher (only if >1 currency), total + trend badge, ant share, bars by day, donut by category, ranked place/method, top ant list. |
-| `/settings` | settings · SettingsPage | default currency, **ant threshold** with explanation, theme, links to Categorías / Métodos / Respaldo, storage-persist status, app version/update. |
+| `/insights` | insights · InsightsPage | Current weekly cap, spent, and remaining or overage for each configured currency (hidden if there are no caps). Separate analytics controls for period and currency, total + trend badge, ant share, and spending breakdowns. |
+| `/settings` | settings · SettingsPage | default currency, **ant threshold** with explanation, weekly caps by currency, theme, links to Categorías / Métodos / Respaldo, storage-persist status, app version/update. |
 | `/settings/categories`, `/settings/methods` | expenses · catalog pages | rename, emoji, color, archive. |
 | `/settings/backup` | backup · BackupPage | export JSON/CSV, import JSON, "último respaldo hace N días". |
 
@@ -519,7 +520,7 @@ multi-currency-ready data model (per-expense currency, per-currency analytics, n
 
 Open: whether the MVP UI should already let users pick a non-default currency per expense (design supports it; default: hidden behind "Cambiar moneda").
 
-Non-goals (MVP): FX conversion/rates provider, backend, auth, sync, multi-device, budgets/alerts, receipts/photos,
+Non-goals (MVP): FX conversion/rates provider, backend, auth, sync, multi-device, budget alerts, receipts/photos,
 geolocation, push notifications, recurring expenses, bank import, SSR, UI languages other than Spanish, NgRx.
 Growth path: `HttpExpenseRepository` + `SyncingExpenseRepository` behind the same ports, an `FX_RATE_PORT` adapter
 (+ `fxRates` store) enabling converted totals, `dataGroups` in ngsw, auth interceptor — no presentation changes.

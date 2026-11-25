@@ -1,4 +1,5 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
+import { SettingsStore } from '@pp/settings';
 import { CLOCK, LiveClock } from '@pp/shared/di';
 import { toIsoWithOffset, type CurrencyCode } from '@pp/shared/kernel';
 import {
@@ -20,6 +21,7 @@ import {
   type TopAntItem,
 } from '../domain/expense-analytics';
 import { canGoNext, previousRange, rangeFor, shiftAnchor, type PeriodKind } from '../domain/period';
+import { weeklyBudgetStatus } from '../domain/weekly-budget';
 import { INSIGHTS_SOURCE, type LabelInfo } from './ports/insights-source';
 
 const PLACE_LIMIT = 5;
@@ -37,6 +39,7 @@ export interface AntHabit extends TopAntItem {
 @Injectable({ providedIn: 'root' })
 export class InsightsStore {
   private readonly source = inject(INSIGHTS_SOURCE);
+  private readonly settings = inject(SettingsStore);
   private readonly clock = inject(CLOCK);
   private readonly liveClock = inject(LiveClock);
 
@@ -49,6 +52,17 @@ export class InsightsStore {
 
   /** Follows the live clock, so resuming the app on a new day moves "today" without moving the chosen period. */
   readonly today = computed(() => toDay(this.liveClock.now()));
+
+  /** Budgets always describe the current week, independently of the analytics range and currency. */
+  readonly weeklyBudgetRange = computed(() => rangeFor('week', this.today()));
+  readonly weeklyBudgets = computed(() => {
+    const caps = this.settings.weeklyBudgets();
+    if (caps.length === 0) return [];
+    const records = this.source.records();
+    const range = this.weeklyBudgetRange();
+    return caps.map((cap) => weeklyBudgetStatus(cap, records, range));
+  });
+
   readonly range = computed(() => rangeFor(this.period(), this.anchor()));
   readonly previous = computed(() => previousRange(this.period(), this.anchor()));
   readonly canGoNext = computed(() => canGoNext(this.period(), this.anchor(), this.today()));

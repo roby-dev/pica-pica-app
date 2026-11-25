@@ -39,6 +39,40 @@ const FALLBACK_COLOR = 'oklch(0.75 0.03 285)';
     <pp-app-header title="Análisis" subtitle="Dónde se va tu plata" />
 
     <div class="flex flex-col gap-4 px-4 pb-6">
+      @if (!store.loading() && store.weeklyBudgets().length) {
+        <section class="glass flex flex-col gap-3 p-5" aria-label="Presupuesto semanal">
+          <div>
+            <h2 class="text-base font-bold text-ink">Presupuesto semanal</h2>
+            <p class="text-sm text-ink-muted">Lunes a domingo · {{ budgetRangeLabel() }}</p>
+          </div>
+          @for (budget of store.weeklyBudgets(); track budget.cap.currency) {
+            <article class="flex flex-col gap-2 border-t border-[var(--glass-border)] pt-3">
+              <h3 class="text-sm font-bold text-ink">{{ budget.cap.currency }}</h3>
+              <dl class="flex flex-col gap-1 text-sm">
+                <div class="flex justify-between gap-2">
+                  <dt class="text-ink-muted">Tope</dt>
+                  <dd><pp-amount-text [money]="budget.cap" emphasis="sm" /></dd>
+                </div>
+                <div class="flex justify-between gap-2">
+                  <dt class="text-ink-muted">Gastado</dt>
+                  <dd><pp-amount-text [money]="budget.spent" emphasis="sm" /></dd>
+                </div>
+                <div class="flex justify-between gap-2 font-semibold">
+                  <dt>{{ budget.overBudget ? 'Te pasaste por' : 'Te queda' }}</dt>
+                  <dd><pp-amount-text [money]="budget.difference" emphasis="sm" /></dd>
+                </div>
+              </dl>
+              <progress
+                class="h-2 w-full accent-accent-strong"
+                [attr.aria-label]="'Presupuesto usado en ' + budget.cap.currency"
+                [max]="budget.cap.amountMinor"
+                [value]="budget.spent.amountMinor"
+              ></progress>
+            </article>
+          }
+        </section>
+      }
+
       <pp-segmented-control [options]="periods" [value]="store.period()" (valueChange)="store.setPeriod($any($event))" />
       <pp-period-navigator
         [label]="rangeLabel()"
@@ -166,6 +200,7 @@ export class InsightsPage {
 
   private readonly locale = DEFAULT_LOCALE;
 
+  protected readonly budgetRangeLabel = computed(() => periodLabel('week', this.store.weeklyBudgetRange(), this.locale));
   protected readonly rangeLabel = computed(() => periodLabel(this.store.period(), this.store.range(), this.locale));
   protected readonly previousName = computed(() => previousPeriodName(this.store.period()));
   protected readonly todayKey = this.store.today;

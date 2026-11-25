@@ -21,7 +21,7 @@ const THEMES: readonly SegmentOption[] = [
   selector: 'pp-settings-page',
   imports: [AppHeader, AmountInput, AmountText, Button, RouterLink, SegmentedControl, TextField],
   template: `
-    <pp-app-header title="Ajustes" subtitle="Presupuesto, umbral y tema" />
+    <pp-app-header title="Ajustes" subtitle="Umbral y tema" />
     <div class="flex flex-col gap-4 pb-6">
       <section class="glass flex flex-col gap-3 p-4" aria-label="Umbral hormiga">
         <h2 class="text-lg font-bold text-ink">Umbral hormiga</h2>

@@ -1,5 +1,6 @@
 import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
+import { provideSettings } from '@pp/settings';
 import { CLOCK } from '@pp/shared/di';
 import { currency, type Money } from '@pp/shared/kernel';
 import { FakeClock } from '@pp/shared/testing';
@@ -33,6 +34,7 @@ function setup(records: readonly SpendRecord[], now = new Date('2026-10-30T13:00
   };
   TestBed.configureTestingModule({
     providers: [
+      provideSettings({ persistence: 'memory' }),
       { provide: INSIGHTS_SOURCE, useValue: source satisfies InsightsSource },
       { provide: CLOCK, useValue: new FakeClock(now) },
     ],
